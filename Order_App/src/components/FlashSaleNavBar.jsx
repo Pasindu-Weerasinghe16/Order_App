@@ -1,8 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
-import { FaMapMarkerAlt, FaShoppingCart, FaChevronDown, FaUser, FaBell, FaSearch } from 'react-icons/fa'
+import { FaMapMarkerAlt, FaShoppingCart, FaChevronDown, FaUser, FaBell } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 
-const NavBarCart = () => {
+const FlashSaleNavBar = () => {
   const location = useLocation()
   
   return (
@@ -63,9 +63,9 @@ const NavBarCart = () => {
           </Link>
         </motion.div>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Link to="/browse-menu">
+          <Link to="/flash-sale">
             <button className={`px-4 py-2 rounded-full text-lg font-medium font-['Poppins'] shadow transition-colors ${
-              location.pathname === '/browse-menu' ? 'bg-amber-500 text-white' : 'bg-neutral-200 text-black hover:bg-amber-100'
+              location.pathname === '/flash-sale' ? 'bg-amber-500 text-white' : 'bg-neutral-200 text-black hover:bg-amber-100'
             }`}>Flash Sale</button>
           </Link>
         </motion.div>
@@ -124,9 +124,15 @@ const NavBarCart = () => {
         >
           User
         </motion.div>
+
+        
       </div>
+            
+
+
+      
     </>
   )
 }
 
-export default NavBarCart
+export default FlashSaleNavBar
