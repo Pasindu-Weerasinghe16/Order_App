@@ -21,7 +21,7 @@ const Footer = () => {
       {/* Logo area with icon and brand name */}
       <div className="flex items-center gap-4 left-[128px] top-[3649px] absolute">
         <FaUtensils className="text-amber-500 text-5xl" />
-        <span className="text-3xl font-extrabold font-['Poppins'] text-slate-950">Order.uk</span>
+        <span className="text-3xl font-extrabold font-['Poppins'] text-slate-950">Order</span>
       </div>
       
       <div className="w-96 h-44 left-[1560px] top-[3676px] absolute justify-start text-black text-base font-normal font-['Poppins'] underline leading-10">
@@ -41,7 +41,7 @@ const Footer = () => {
       {/* Modern logo background area (simplified) */}
       <div className="w-96 h-14 left-[127.78px] top-[3748px] absolute flex items-center justify-center bg-gradient-to-r from-amber-200 via-white to-amber-100 rounded-xl shadow">
         <FaUtensils className="text-amber-500 text-3xl mr-2" />
-        <span className="text-xl font-bold text-slate-950">Order.uk</span>
+        <span className="text-xl font-bold text-slate-950">Order</span>
       </div>
       
       <div className="w-96 h-14 left-[696.67px] top-[3703px] absolute bg-zinc-300 rounded-[120px]" />
