@@ -4,6 +4,8 @@ import BrowseMenu from './pages/BrowseMenu'
 import Cart from './pages/Cart'
 import ContactUs from './pages/ContactUs'
 import SignUpPage from './pages/SignUpPage'
+import SignInPage from './pages/SignInPage'
+import SignUpSupplierPage from './pages/SignUpSupplierPage'
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/login" element={<SignInPage />} />
+        <Route path="/supplier-signup" element={<SignUpSupplierPage />} />
       </Routes>
     </div>
   )

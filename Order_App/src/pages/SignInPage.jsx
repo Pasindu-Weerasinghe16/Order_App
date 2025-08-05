@@ -1,73 +1,37 @@
 import { motion } from 'framer-motion'
-import { FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa'
+import { FaEye } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 
-const SignUpPage = () => {
+const SignInPage = () => {
   return (
     <div className="min-h-screen w-full flex bg-white overflow-hidden">
-      {/* Left Side Image - Fixed positioning */}
+      {/* Left Side Image - Fixed height and positioning */}
       <div className="hidden md:block w-1/2 h-screen overflow-hidden fixed left-0 top-0">
         <img 
-          src="/Assets/SignUp_bg.jpg" 
+          src="/Assets/SignIn_bg.jpg" 
           alt="Background" 
-          className="w-full h-full object-cover object-left"
+          className="w-full h-full object-cover object-center"
         />
       </div>
       
-      {/* Sign Up Form Container */}
+      {/* Sign In Form Container on the right - Adjusted margins */}
       <motion.div 
         className="relative w-full md:w-1/2 bg-white rounded-tl-[70px] rounded-bl-[70px] overflow-hidden p-8 md:p-12 lg:p-16 z-10 flex flex-col justify-center ml-auto"
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        style={{ minHeight: '100vh' }}
+        style={{ minHeight: '100vh' }} // Ensure full viewport height
       >
-       
-        
         {/* Title */}
         <div className="text-center mb-12">
           <h1 className="text-gray-800 text-3xl md:text-4xl lg:text-5xl font-bold font-['Montserrat']">
-            Sign Up
+            Login
           </h1>
         </div>
         
         {/* Form */}
         <div className="flex flex-col items-center gap-8">
           <div className="w-full max-w-lg space-y-6">
-            {/* First Name Field */}
-            <motion.div 
-              className="space-y-2"
-              whileHover={{ scale: 1.01 }}
-            >
-              <label className="text-zinc-600 text-base md:text-lg font-normal font-['Open_Sans']">
-                First Name
-              </label>
-              <div className="relative">
-                <input 
-                  type="text" 
-                  className="w-full p-4 text-base md:text-lg border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  placeholder="Enter your first name"
-                />
-              </div>
-            </motion.div>
-            
-            {/* Last Name Field */}
-            <motion.div 
-              className="space-y-2"
-              whileHover={{ scale: 1.01 }}
-            >
-              <label className="text-zinc-600 text-base md:text-lg font-normal font-['Open_Sans']">
-                Last Name
-              </label>
-              <div className="relative">
-                <input 
-                  type="text" 
-                  className="w-full p-4 text-base md:text-lg border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  placeholder="Enter your last name"
-                />
-              </div>
-            </motion.div>
-            
             {/* Email Field */}
             <motion.div 
               className="space-y-2"
@@ -109,37 +73,54 @@ const SignUpPage = () => {
               </div>
             </motion.div>
             
-            {/* Create Account Button */}
+            {/* Login Button */}
             <motion.div 
               className="pt-4"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <button className="w-full py-4 bg-green-700 hover:bg-green-800 text-white text-lg md:text-xl font-bold rounded-lg transition-colors duration-300">
-                Create Account
+                Login
               </button>
             </motion.div>
             
-            {/* Login Link */}
-            <motion.div 
-              className="text-center pt-4"
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="flex justify-center items-center gap-1">
-                <span className="text-zinc-600 text-base md:text-lg font-normal">
-                  Already have an account?
-                </span>
-                <Link to="/login">
+            {/* Sign Up Links */}
+            <div className="flex flex-col items-center pt-4 space-y-4">
+              <motion.div 
+                className="text-center"
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="flex justify-center items-center gap-1">
+                  <span className="text-zinc-600 text-base md:text-lg font-normal">
+                    Don't have an account?
+                  </span>
+                  <Link to="/signup">
+                    <motion.span 
+                      className="text-gray-800 font-medium underline px-1"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      Sign up
+                    </motion.span>
+                  </Link>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="text-center"
+                whileHover={{ scale: 1.02 }}
+              >
+                <Link to="/supplier-signup">
                   <motion.span 
-                    className="text-gray-800 font-medium underline px-1"
+                    className="text-gray-800 font-medium underline"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
-                    Log In
+                    Sign up as a supplier
                   </motion.span>
                 </Link>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -147,4 +128,4 @@ const SignUpPage = () => {
   )
 }
 
-export default SignUpPage
+export default SignInPage
