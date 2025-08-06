@@ -1,22 +1,14 @@
 const express = require('express');
+const router = express.Router();
 const {
   getProducts,
-  getProductById,
   createProduct,
   updateProduct,
-  deleteProduct,
-  getFlashSaleProducts,
+  deleteProduct
 } = require('../controllers/ProductController');
-const { protect, supplier } = require('../middlewares/auth');
+const { protect } = require('../middleware/authMiddleware');
 
-const router = express.Router();
-
-router.route('/').get(getProducts).post(protect, supplier, createProduct);
-router.route('/flash-sale').get(getFlashSaleProducts);
-router
-  .route('/:id')
-  .get(getProductById)
-  .put(protect, supplier, updateProduct)
-  .delete(protect, supplier, deleteProduct);
+router.route('/').get(getProducts).post(protect, createProduct);
+router.route('/:id').put(protect, updateProduct).delete(protect, deleteProduct);
 
 module.exports = router;

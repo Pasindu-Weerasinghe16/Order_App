@@ -3,43 +3,27 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = mongoose.Schema(
   {
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
+    firstName: String,
+    lastName: String,
     email: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
     password: {
       type: String,
-      required: true,
+      required: true
     },
     isSupplier: {
       type: Boolean,
       required: true,
-      default: false,
+      default: false
     },
-    companyName: {
-      type: String,
-      required: function() {
-        return this.isSupplier;
-      },
-    },
-    contactPerson: {
-      type: String,
-      required: function() {
-        return this.isSupplier;
-      },
-    },
+    companyName: String,
+    contactPerson: String
   },
   {
-    timestamps: true,
+    timestamps: true
   }
 );
 
@@ -57,5 +41,4 @@ userSchema.pre('save', async function (next) {
 });
 
 const User = mongoose.model('User', userSchema);
-
 module.exports = User;
