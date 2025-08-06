@@ -10,6 +10,7 @@ import ContactUsPage from './pages/ContactUsPage'
 import FlashSalePage from './pages/FlashSalePage'
 
 import SupplierDashboard from './Spplier_InterFace/SuplierPage'
+import CartPage from './pages/CartPage'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/supplier-signup" element={<SignUpSupplierPage />} />
         <Route path="/flash-sale" element={<FlashSalePage />} />
         <Route path="/supplier" element={<SupplierDashboard />} />
+        <Route path= "/cart-page"  element={<CartPage />} />
       </Routes>
     </div>
   )
