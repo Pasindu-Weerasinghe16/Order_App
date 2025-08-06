@@ -1,11 +1,9 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import NavBarCart from '../components/NavBarCart';
-import { useState, useEffect } from 'react';
+import { getProducts } from '../api';
 
-
-
-// Reusable Product Card Component
 const ProductCard = ({ product, onAddToCart }) => {
   return (
     <motion.div 
@@ -25,7 +23,14 @@ const ProductCard = ({ product, onAddToCart }) => {
           <p className="text-black text-base mt-2">{product.description}</p>
         </div>
         <div className="flex justify-between items-center mt-6">
-          <span className="text-slate-950 text-xl font-bold">LKR {product.price.toFixed(2)}</span>
+          <span className="text-slate-950 text-xl font-bold">
+            LKR {product.discounted ? product.discountPrice.toFixed(2) : product.price.toFixed(2)}
+            {product.discounted && (
+              <span className="ml-2 text-sm text-gray-500 line-through">
+                LKR {product.price.toFixed(2)}
+              </span>
+            )}
+          </span>
           <button 
             onClick={() => onAddToCart(product)}
             className="bg-green-700 text-white p-3 rounded-lg flex items-center justify-center"
@@ -40,7 +45,6 @@ const ProductCard = ({ product, onAddToCart }) => {
   );
 };
 
-// Reusable Filter Component
 const FilterSection = ({ title, options, selectedFilters, onFilterChange }) => {
   return (
     <div className="mb-8">
@@ -62,37 +66,24 @@ const FilterSection = ({ title, options, selectedFilters, onFilterChange }) => {
   );
 };
 
-// Reusable Stat Component
-const StatCard = ({ value, label }) => {
-  return (
-    <div className="text-center">
-      <h3 className="text-white text-4xl md:text-5xl font-light">{value}</h3>
-      <p className="text-white text-xl font-bold mt-2">{label}</p>
-    </div>
-  );
-};
-
-const CartPage = () => {
+const ProductPage = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [priceFilter, setPriceFilter] = useState([]);
   const [categoryFilter, setCategoryFilter] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch products from database
+  // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'products'));
-        const productsData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setProducts(productsData);
-        setFilteredProducts(productsData);
+        const productsData = await getProducts();
+        setProducts(productsData.data);
+        setFilteredProducts(productsData.data);
         setLoading(false);
-      } catch (error) {
-        console.error('Error fetching products:', error);
+      } catch (err) {
+        setError(err.message);
         setLoading(false);
       }
     };
@@ -121,9 +112,14 @@ const CartPage = () => {
     setFilteredProducts(result);
   }, [priceFilter, categoryFilter, products]);
 
-  const handleAddToCart = (product) => {
-    // Add to cart logic (could be Redux, Context API, or direct database update)
-    console.log('Added to cart:', product);
+  const handleAddToCart = async (product) => {
+    try {
+      await addToCart(product._id, 1);
+      // You can add a toast notification here for success
+    } catch (err) {
+      console.error('Error adding to cart:', err);
+      // Handle error (show error message)
+    }
   };
 
   const priceOptions = [
@@ -140,19 +136,23 @@ const CartPage = () => {
     { value: 'other', label: 'Other' }
   ];
 
-  const stats = [
-    { value: "546+", label: "Registered Riders" },
-    { value: "789,900+", label: "Orders Delivered" },
-    { value: "690+", label: "Restaurants Partnered" },
-    { value: "17,457+", label: "Food items" },
-  ];
-
   if (loading) {
     return (
       <div className="min-h-screen w-full relative bg-white overflow-hidden">
         <NavBarCart />
         <div className="container mx-auto px-4 py-8 mt-60 text-center">
           Loading products...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen w-full relative bg-white overflow-hidden">
+        <NavBarCart />
+        <div className="container mx-auto px-4 py-8 mt-60 text-center">
+          Error: {error}
         </div>
       </div>
     );
@@ -202,7 +202,7 @@ const CartPage = () => {
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <ProductCard 
-                key={product.id}
+                key={product._id}
                 product={product}
                 onAddToCart={handleAddToCart}
               />
@@ -223,83 +223,8 @@ const CartPage = () => {
           )}
         </div>
       </div>
-
-      {/* Stats Section */}
-      <div className="bg-amber-500 rounded-xl py-8 my-12">
-        <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, index) => (
-            <StatCard key={index} value={stat.value} label={stat.label} />
-          ))}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="bg-zinc-300 py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <img src="/assets/logo_footer.png" alt="Logo" className="h-12 mb-4" />
-              <div className="flex gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <img key={i} src={`/assets/social_${i}.png`} alt="Social" className="w-10 h-10" />
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-slate-950 text-lg font-bold mb-4">Get Exclusive Deals in your Inbox</h4>
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="youremail@gmail.com" 
-                  className="flex-1 bg-zinc-300 rounded-l-full px-6 py-3 border border-black/40"
-                />
-                <button className="bg-amber-500 text-white px-6 py-3 rounded-r-full font-medium">
-                  Subscribe
-                </button>
-              </div>
-              <p className="text-slate-950 text-xs mt-2">
-                we won't spam, read our <span className="underline">email policy</span>
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-8">
-              <div>
-                <h4 className="text-slate-950 text-lg font-bold mb-4">Important Links</h4>
-                <ul className="space-y-2 text-black underline">
-                  <li>Get help</li>
-                  <li>Add your restaurant</li>
-                  <li>Sign up to deliver</li>
-                  <li>Create a business account</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-slate-950 text-lg font-bold mb-4">Legal Pages</h4>
-                <ul className="space-y-2 text-black underline">
-                  <li>Terms and conditions</li>
-                  <li>Privacy</li>
-                  <li>Cookies</li>
-                  <li>Modern Slavery Statement</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-slate-950 py-4">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-white">Order.uk Copyright 2024, All Rights Reserved.</p>
-          <div className="flex gap-8 text-white">
-            <span>Privacy Policy</span>
-            <span>Terms</span>
-            <span>Pricing</span>
-            <span>Do not sell or share my personal information</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
 
-export default CartPage;
+export default ProductPage;
