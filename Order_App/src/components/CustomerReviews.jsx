@@ -1,77 +1,102 @@
 import { FaArrowRight, FaArrowLeft, FaStar, FaRegCalendarAlt, FaUserCircle } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const CustomerReviews = () => {
-  return (
-    <>
-      <div className="w-[1726px] h-[600px] left-[97px] top-[2847px] absolute bg-zinc-300" />
-      <img className="w-40 h-44 left-[883px] top-[3358px] absolute rounded-xl" src="/assets/pic_21.png" alt="customer review" />
-      <div className="left-[196px] top-[2939px] absolute justify-start text-black text-5xl font-bold font-['Poppins']">Customer Reviews</div>
-      
-      <FaArrowRight className="w-9 h-9 left-[1685px] top-[2990px] absolute text-amber-500 cursor-pointer" />
-      
-      <FaArrowLeft className="w-9 h-9 left-[1551px] top-[2953px] absolute text-amber-500 cursor-pointer" />
-      
-      {/* Review 1 */}
-      <div className="w-[496px] h-72 left-[196px] top-[3044px] absolute bg-white rounded" />
-      <div className="w-96 h-32 left-[225px] top-[3169px] absolute justify-start text-black text-base font-normal font-['Poppins'] leading-relaxed">
-        The positive aspect was undoubtedly the efficiency of the service. The queue moved quickly, the staff was friendly, and the food was up to the usual McDonald's standard – hot and satisfying.
-      </div>
-      <div className="w-28 h-11 left-[299px] top-[3088px] absolute justify-start">
-        <span className="text-slate-950 text-lg font-semibold font-['Poppins'] leading-tight">St Glx</span>
-        <span className="text-black text-base font-normal font-['Poppins'] leading-tight"> </span>
-        <span className="text-amber-500 text-base font-normal font-['Poppins'] leading-tight">South London</span>
-      </div>
-      <FaUserCircle className="w-14 h-14 left-[220px] top-[3079px] absolute text-gray-400" />
-      <FaStar className="w-4 h-4 left-[575px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[595px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[615.01px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[635.01px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[655.02px] top-[3088px] absolute text-amber-500" />
-      <div className="w-0.5 h-12 left-[284px] top-[3082px] absolute bg-amber-500" />
-      <div className="left-[508px] top-[3110px] absolute justify-start text-black text-base font-normal font-['Poppins'] leading-tight">24th September, 2023</div>
-      <FaRegCalendarAlt className="w-6 h-6 left-[472px] top-[3108px] absolute text-gray-500" />
-      
-      {/* Review 2 */}
-      <div className="w-[496px] h-72 left-[712px] top-[3044px] absolute bg-white rounded" />
-      <div className="w-96 h-32 left-[741px] top-[3169px] absolute justify-start text-black text-base font-normal font-['Poppins'] leading-relaxed">
-        The positive aspect was undoubtedly the efficiency of the service. The queue moved quickly, the staff was friendly, and the food was up to the usual McDonald's standard – hot and satisfying.
-      </div>
-      <div className="w-28 h-11 left-[815px] top-[3088px] absolute justify-start">
-        <span className="text-slate-950 text-lg font-semibold font-['Poppins'] leading-tight">St Glx</span>
-        <span className="text-black text-base font-normal font-['Poppins'] leading-tight"> </span>
-        <span className="text-amber-500 text-base font-normal font-['Poppins'] leading-tight">South London</span>
-      </div>
-      <FaUserCircle className="w-14 h-14 left-[736px] top-[3079px] absolute text-gray-400" />
-      <FaStar className="w-4 h-4 left-[1091px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[1111px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[1131.01px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[1151.01px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[1171.02px] top-[3088px] absolute text-amber-500" />
-      <div className="w-0.5 h-12 left-[800px] top-[3082px] absolute bg-amber-500" />
-      <div className="left-[1024px] top-[3110px] absolute justify-start text-black text-base font-normal font-['Poppins'] leading-tight">24th September, 2023</div>
-      <FaRegCalendarAlt className="w-6 h-6 left-[988px] top-[3108px] absolute text-gray-500" />
-      
-      {/* Review 3 */}
-      <div className="w-[496px] h-72 left-[1228px] top-[3044px] absolute bg-white rounded" />
-      <div className="w-96 h-32 left-[1257px] top-[3169px] absolute justify-start text-black text-base font-normal font-['Poppins'] leading-relaxed">
-        The positive aspect was undoubtedly the efficiency of the service. The queue moved quickly, the staff was friendly, and the food was up to the usual McDonald's standard – hot and satisfying.
-      </div>
-      <div className="w-28 h-11 left-[1331px] top-[3088px] absolute justify-start">
-        <span className="text-slate-950 text-lg font-semibold font-['Poppins'] leading-tight">St Glx</span>
-        <span className="text-black text-base font-normal font-['Poppins'] leading-tight"> </span>
-        <span className="text-amber-500 text-base font-normal font-['Poppins'] leading-tight">South London</span>
-      </div>
-      <FaUserCircle className="w-14 h-14 left-[1252px] top-[3079px] absolute text-gray-400" />
-      <FaStar className="w-4 h-4 left-[1607px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[1627px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[1647.01px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[1667.01px] top-[3088px] absolute text-amber-500" />
-      <FaStar className="w-4 h-4 left-[1687.02px] top-[3088px] absolute text-amber-500" />
-      <div className="w-0.5 h-12 left-[1316px] top-[3082px] absolute bg-amber-500" />
-      <div className="left-[1540px] top-[3110px] absolute justify-start text-black text-base font-normal font-['Poppins'] leading-tight">24th September, 2023</div>
-      <FaRegCalendarAlt className="w-6 h-6 left-[1504px] top-[3108px] absolute text-gray-500" />
-    </>
-  )
-}
+  const reviews = [
+    {
+      name: "Kamal Perera",
+      location: "Colombo 03",
+      date: "24th September, 2023",
+      content: "The delivery was incredibly fast despite heavy rain. My burger arrived hot and fresh, exactly as ordered. The delivery rider was very polite despite the bad weather.",
+      rating: 5
+    },
+    {
+      name: "Nimali Fernando",
+      location: "Kotte",
+      date: "15th October, 2023",
+      content: "I appreciate how they accommodated my special request for no onions. The food quality was excellent and arrived before the estimated time. Will definitely order again!",
+      rating: 4
+    },
+    {
+      name: "Sanjeewa Rathnayake",
+      location: "Battaramulla",
+      date: "5th November, 2023",
+      content: "The midnight delivery service saved us during a late-night work session. The food was piping hot and the packaging was very secure. Excellent service overall.",
+      rating: 5
+    }
+  ];
 
-export default CustomerReviews
+  return (
+    <div className="w-[1726px] h-[600px] left-[97px] top-[2847px] absolute bg-zinc-300">
+      {/* Section title - perfectly aligned with left edge */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="left-[99px] top-[92px] absolute text-black text-5xl font-bold font-['Poppins']"
+      >
+        Customer Reviews
+      </motion.div>
+
+      {/* Navigation arrows - perfectly aligned with right edge */}
+      <div className="flex justify-between items-center absolute w-[13px] left-[1500px] top-[104px]">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          className="text-amber-500 text-3xl p-2"
+        >
+          <FaArrowLeft />
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          className="text-amber-500 text-3xl p-2"
+        >
+          <FaArrowRight />
+        </motion.button>
+      </div>
+
+      {/* Reviews grid - perfectly aligned */}
+      <div className="absolute left-[99px] top-[197px] flex gap-[20px]">
+        {reviews.map((review, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            whileHover={{ y: -10 }}
+            className="w-[496px] h-[300px] bg-white rounded-lg shadow-md p-6"
+          >
+            <div className="flex items-center gap-4 mb-4">
+              <FaUserCircle className="text-4xl text-gray-400" />
+              <div>
+                <h3 className="text-lg font-semibold font-['Poppins'] text-slate-950">
+                  {review.name}
+                </h3>
+                <p className="text-amber-500 text-sm">{review.location}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 mb-4">
+              {[...Array(5)].map((_, i) => (
+                <FaStar 
+                  key={i} 
+                  className={`text-sm ${i < review.rating ? 'text-amber-500' : 'text-gray-300'}`} 
+                />
+              ))}
+            </div>
+
+            <p className="text-black text-base font-normal font-['Poppins'] leading-relaxed mb-6">
+              {review.content}
+            </p>
+
+            <div className="flex items-center gap-2 text-gray-500">
+              <FaRegCalendarAlt />
+              <span className="text-sm">{review.date}</span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default CustomerReviews;

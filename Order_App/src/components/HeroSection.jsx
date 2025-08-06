@@ -26,7 +26,7 @@ const HeroSection = () => {
         e.g. EC4R 3TE
       </div>
       <div className="w-80 h-16 left-[1334px] top-[1074px] absolute bg-white rounded-[120px] border border-white" />
-      <div className="w-14 h-9 left-[1352px] top-[1088px] absolute bg-black rounded-2xl" />
+      <div className="w-14 h-9 left-[1352px] top-[1088px] absolute bg-orange rounded-2xl" />
       <div className="left-[1415px] top-[1071px] absolute justify-start text-red-600 text-lg font-semibold font-['Poppins'] leading-[66px]">
         Delivery in 20-25 Minutes
       </div>

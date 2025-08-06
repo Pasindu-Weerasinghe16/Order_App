@@ -64,8 +64,8 @@ const NavBar = () => {
           </Link>
         </motion.div>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Link to="/cart">
-            <button className="px-4 py-2 rounded-full bg-neutral-200 text-black text-lg font-medium font-['Poppins'] shadow hover:bg-amber-100 transition-colors">Cart</button>
+          <Link to="/product">
+            <button className="px-4 py-2 rounded-full bg-neutral-200 text-black text-lg font-medium font-['Poppins'] shadow hover:bg-amber-100 transition-colors">Product</button>
           </Link>
         </motion.div>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
