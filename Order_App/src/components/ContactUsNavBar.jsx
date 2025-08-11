@@ -1,9 +1,10 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FaMapMarkerAlt, FaShoppingCart, FaChevronDown, FaUser, FaBell } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 
 const ContactUsNavBar = () => {
-  const location = useLocation()
+  const location = useLocation();
+  const navigate = useNavigate();
   
   return (
     <>
@@ -91,6 +92,7 @@ const ContactUsNavBar = () => {
           className="px-6 py-2 rounded-full bg-slate-950 text-white text-lg font-medium font-['Poppins'] hover:bg-amber-500 transition-colors duration-200 flex items-center gap-2"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/login')}
         >
           <FaUser className="w-5 h-5" /> Login
         </motion.button>
@@ -98,6 +100,7 @@ const ContactUsNavBar = () => {
           className="px-6 py-2 rounded-full bg-amber-500 text-white text-lg font-medium font-['Poppins'] hover:bg-slate-950 transition-colors duration-200 flex items-center gap-2"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/signup')}
         >
           Signup
         </motion.button>
