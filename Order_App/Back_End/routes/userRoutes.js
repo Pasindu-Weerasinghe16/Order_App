@@ -13,4 +13,7 @@ router.post('/register-supplier', registerSupplier);
 router.post('/login', loginUser);
 router.get('/profile', protect, getUserProfile);
 
+
+
+
 module.exports = router;

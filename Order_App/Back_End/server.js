@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-
+const userRoutes = require('./routes/userRoutes');
 const app = express();
 
 // Improved CORS configuration
@@ -29,6 +29,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/auth', userRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

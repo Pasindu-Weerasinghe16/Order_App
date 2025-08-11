@@ -48,18 +48,20 @@ const registerSupplier = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create({
-    companyName,
-    contactPerson,
     email,
     password,
-    isSupplier: true
+    isSupplier: true,
+    companyName,
+    contactPerson
   });
 
   if (user) {
     res.status(201).json({
-      _id: user._id,
+      _id: user.id,
       email: user.email,
       isSupplier: user.isSupplier,
+      companyName: user.companyName,
+      contactPerson: user.contactPerson,
       token: generateToken(user._id)
     });
   } else {
@@ -67,6 +69,7 @@ const registerSupplier = asyncHandler(async (req, res) => {
     throw new Error('Invalid supplier data');
   }
 });
+
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
