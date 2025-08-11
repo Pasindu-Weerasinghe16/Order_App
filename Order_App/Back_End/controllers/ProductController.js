@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const Product = require('../models/productModel');
+const Product = require('../models/ProductModel');
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -11,12 +11,10 @@ const getProducts = asyncHandler(async (req, res) => {
 // @desc    Create a product
 // @route   POST /api/products
 const createProduct = asyncHandler(async (req, res) => {
-  const { name, image, description, category, price, stock, unit } = req.body;
+  const { name, description, category, price, stock, unit } = req.body;
 
   const product = new Product({
-    user: req.user._id,
     name,
-    image,
     description,
     category,
     price,
@@ -31,18 +29,17 @@ const createProduct = asyncHandler(async (req, res) => {
 // @desc    Update a product
 // @route   PUT /api/products/:id
 const updateProduct = asyncHandler(async (req, res) => {
-  const { name, image, description, category, price, stock, unit } = req.body;
+  const { name, description, category, price, stock, unit } = req.body;
 
   const product = await Product.findById(req.params.id);
 
   if (product) {
-    product.name = name || product.name;
-    product.image = image || product.image;
-    product.description = description || product.description;
-    product.category = category || product.category;
-    product.price = price || product.price;
-    product.stock = stock || product.stock;
-    product.unit = unit || product.unit;
+  product.name = name || product.name;
+  product.description = description || product.description;
+  product.category = category || product.category;
+  product.price = price || product.price;
+  product.stock = stock || product.stock;
+  product.unit = unit || product.unit;
 
     const updatedProduct = await product.save();
     res.json(updatedProduct);
@@ -72,3 +69,4 @@ module.exports = {
   updateProduct,
   deleteProduct
 };
+

@@ -1,33 +1,31 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { getCart, addToCart, createOrder } from '../api';
 
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 'prod001',
-      name: 'Organic Apples',
-      image: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YXBwbGV8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
-      price: 1200.00,
-      quantity: 2,
-      category: 'fruits'
-    },
-    {
-      id: 'prod002',
-      name: 'Fresh Salmon Fillet',
-      image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2FsbW9ufGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
-      price: 3200.00,
-      quantity: 1,
-      category: 'meat'
-    },
-    {
-      id: 'prod003',
-      name: 'Artisan Bread',
-      image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YnJlYWR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60',
-      price: 850.00,
-      quantity: 3,
-      category: 'bakery'
-    }
-  ]);
+  const [cartItems, setCartItems] = useState([]);
+  // Fetch cart from backend
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const res = await getCart();
+        // Map backend cart items to frontend format
+        setCartItems(
+          res.data.items.map(item => ({
+            id: item.product._id,
+            name: item.product.name,
+            image: '', // Set a default or static image if needed
+            price: item.product.price,
+            quantity: item.quantity,
+            category: item.product.category
+          }))
+        );
+      } catch (err) {
+        setCartItems([]);
+      }
+    };
+    fetchCart();
+  }, []);
 
   const [orderHistory, setOrderHistory] = useState([
     {
@@ -75,57 +73,50 @@ const CartPage = () => {
     setCartItems(cartItems.filter(item => item.id !== id));
   };
 
-  const addToCart = () => {
-    // This would be your actual implementation to add to MongoDB
-    console.log("Adding items to MongoDB database...");
-    // Typically you would do something like:
-    // fetch('/api/cart', {
-    //   method: 'POST',
-    //   headers: {'Content-Type': 'application/json'},
-    //   body: JSON.stringify(cartItems)
-    // }).then(response => response.json())
-    // .then(data => console.log('Success:', data))
-    // .catch(error => console.error('Error:', error));
+  // Example: Add a product to cart (call this from a button in your UI)
+  const handleAddToCart = async (productId, quantity = 1) => {
+    try {
+      await addToCart(productId, quantity);
+      // Refresh cart
+      const res = await getCart();
+      setCartItems(
+        res.data.items.map(item => ({
+          id: item.product._id,
+          name: item.product.name,
+          image: '',
+          price: item.product.price,
+          quantity: item.quantity,
+          category: item.product.category
+        }))
+      );
+    } catch (err) {
+      // Handle error
+    }
   };
 
-  const proceedToCheckout = () => {
+  const proceedToCheckout = async () => {
     if (cartItems.length === 0) {
       setAlertMessage('Your cart is empty. Please add items before checkout.');
       setShowAlert(true);
       return;
     }
-
-    // Generate a new order ID
-    const newOrderId = `ORD${(orderHistory.length + 1).toString().padStart(3, '0')}`;
-    
-    // Get current date in YYYY-MM-DD format
-    const today = new Date();
-    const dateString = today.toISOString().split('T')[0];
-    
-    // Create new order
-    const newOrder = {
-      id: newOrderId,
-      date: dateString,
-      items: cartItems.reduce((sum, item) => sum + item.quantity, 0),
-      total: total,
-      status: 'Ongoing',
-      itemsDetails: [...cartItems] // Store the cart items for reference
-    };
-
-    // Add to order history
-    setOrderHistory([newOrder, ...orderHistory]);
-    
-    // Show success message
-    setAlertMessage(`Order #${newOrderId} has been placed successfully! Status: Ongoing`);
-    setShowAlert(true);
-    
-    // Clear the cart (optional - you might want to keep items until payment is confirmed)
-    // setCartItems([]);
-    
-    // Hide alert after 5 seconds
-    setTimeout(() => {
-      setShowAlert(false);
-    }, 5000);
+    try {
+      const items = cartItems.map(item => ({
+        product: item.id,
+        quantity: item.quantity,
+        price: item.price
+      }));
+      const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      await createOrder({ items, totalPrice });
+      setAlertMessage('Order placed successfully!');
+      setShowAlert(true);
+      setCartItems([]); // Optionally clear cart
+      setTimeout(() => setShowAlert(false), 5000);
+    } catch (err) {
+      setAlertMessage('Failed to place order.');
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 5000);
+    }
   };
 
   return (

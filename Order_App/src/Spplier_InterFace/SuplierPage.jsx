@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createProduct } from '../api';
 import { motion } from 'framer-motion'
 import { FiUpload, FiEdit2, FiTrash2, FiPlus, FiPackage, FiDollarSign, FiTag, FiInfo } from 'react-icons/fi'
 
@@ -7,7 +8,7 @@ const initialProduct = {
   description: '',
   price: '',
   category: '',
-  image: '',
+  // image: '',
   stock: '',
   unit: 'kg'
 }
@@ -29,7 +30,7 @@ const SupplierDashboard = () => {
   const [products, setProducts] = useState([])
   const [form, setForm] = useState(initialProduct)
   const [editIndex, setEditIndex] = useState(null)
-  const [imgPreview, setImgPreview] = useState('')
+  // const [imgPreview, setImgPreview] = useState('')
   const [activeTab, setActiveTab] = useState('products')
   const [stats] = useState({
     totalProducts: 48,
@@ -39,39 +40,32 @@ const SupplierDashboard = () => {
   })
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target
-    if (name === 'image' && files[0]) {
-      const reader = new FileReader()
-      reader.onload = (ev) => setImgPreview(ev.target.result)
-      reader.readAsDataURL(files[0])
-      setForm({ ...form, image: files[0] })
-    } else {
-      setForm({ ...form, [name]: value })
-    }
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (!form.name || !form.price || !form.category || !form.image) return
-    
-    const productData = { 
-      ...form, 
-      image: imgPreview,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name || !form.price || !form.category) {
+      alert('Please fill in all required fields.');
+      return;
     }
-
-    if (editIndex !== null) {
-      const updated = [...products]
-      updated[editIndex] = productData
-      setProducts(updated)
-      setEditIndex(null)
-    } else {
-      setProducts([...products, productData])
+    try {
+      const productData = {
+        name: form.name,
+        description: form.description,
+        category: form.category,
+        price: parseFloat(form.price),
+        stock: parseInt(form.stock) || 0,
+        unit: form.unit
+      };
+      const res = await createProduct(productData);
+      setProducts([...products, res.data]);
+      setForm(initialProduct);
+      alert('Product added successfully!');
+    } catch (err) {
+      alert('Failed to add product.');
     }
-    
-    setForm(initialProduct)
-    setImgPreview('')
   }
 
   const handleEdit = (idx) => {
@@ -258,41 +252,8 @@ const SupplierDashboard = () => {
                 </div>
                 
                 <div className="flex flex-col">
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Product Image {!editIndex && '*'}
-                    </label>
-                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl">
-                      <div className="space-y-1 text-center">
-                        {imgPreview ? (
-                          <img src={imgPreview} alt="Preview" className="mx-auto h-48 w-auto object-contain rounded-lg" />
-                        ) : (
-                          <>
-                            <div className="flex text-gray-400 justify-center">
-                              <FiUpload className="text-4xl" />
-                            </div>
-                            <div className="flex text-sm text-gray-600">
-                              <label className="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none">
-                                <span>Upload a file</span>
-                                <input 
-                                  type="file" 
-                                  name="image"
-                                  accept="image/*"
-                                  onChange={handleChange}
-                                  className="sr-only"
-                                  required={!editIndex}
-                                />
-                              </label>
-                              <p className="pl-1">or drag and drop</p>
-                            </div>
-                            <p className="text-xs text-gray-500">
-                              PNG, JPG, GIF up to 5MB
-                            </p>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+
+                  {/* Image upload removed. You can add a static image to product cards instead. */}
                   
                   <motion.button
                     whileHover={{ scale: 1.02 }}
