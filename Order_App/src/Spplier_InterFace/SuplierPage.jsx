@@ -43,7 +43,12 @@ const SupplierDashboard = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    // Special handling for discounted select
+    if (name === 'discounted') {
+      setForm({ ...form, discounted: value === 'true' });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -60,7 +65,7 @@ const SupplierDashboard = () => {
         price: parseFloat(form.price),
         stock: parseInt(form.stock) || 0,
         unit: form.unit,
-        discounted: form.discounted,
+        discounted: !!form.discounted,
         discountPrice: form.discounted ? parseFloat(form.discountPrice) : undefined
       };
       console.log('Submitting:', productData);
@@ -255,20 +260,21 @@ const SupplierDashboard = () => {
                   </div>
                   {/* Discount Section */}
                   <div className="grid grid-cols-2 gap-6 mt-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Discounted?</label>
+                      <select
                         name="discounted"
-                        checked={form.discounted}
-                        onChange={e => setForm(f => ({ ...f, discounted: e.target.checked }))}
-                        className="w-5 h-5 rounded border-gray-400"
-                        id="discounted"
-                      />
-                      <label htmlFor="discounted" className="text-sm font-medium text-gray-700 mb-0">Discounted?</label>
+                        value={form.discounted ? 'true' : 'false'}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      >
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                      </select>
                     </div>
                     {form.discounted && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Discount Precentage (%)</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Discount Price</label>
                         <input
                           type="number"
                           name="discountPrice"

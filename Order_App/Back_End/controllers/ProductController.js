@@ -12,7 +12,8 @@ const getProducts = asyncHandler(async (req, res) => {
 // @route   POST /api/products
 const createProduct = asyncHandler(async (req, res) => {
   const { name, description, category, price, stock, unit, discounted, discountPrice } = req.body;
-
+  // Ensure discounted is boolean
+  const isDiscounted = discounted === true || discounted === 'true';
   const product = new Product({
     name,
     description,
@@ -20,10 +21,9 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     stock,
     unit,
-    discounted,
-    discountPrice
+    discounted: isDiscounted,
+    discountPrice: isDiscounted ? discountPrice : undefined
   });
-
   const createdProduct = await product.save();
   res.status(201).json(createdProduct);
 });
@@ -32,19 +32,18 @@ const createProduct = asyncHandler(async (req, res) => {
 // @route   PUT /api/products/:id
 const updateProduct = asyncHandler(async (req, res) => {
   const { name, description, category, price, stock, unit, discounted, discountPrice } = req.body;
-
   const product = await Product.findById(req.params.id);
-
   if (product) {
-  product.name = name || product.name;
-  product.description = description || product.description;
-  product.category = category || product.category;
-  product.price = price || product.price;
-  product.stock = stock || product.stock;
-  product.unit = unit || product.unit;
-  product.discounted = discounted !== undefined ? discounted : product.discounted;
-  product.discountPrice = discountPrice !== undefined ? discountPrice : product.discountPrice;
-
+    product.name = name || product.name;
+    product.description = description || product.description;
+    product.category = category || product.category;
+    product.price = price || product.price;
+    product.stock = stock || product.stock;
+    product.unit = unit || product.unit;
+    // Ensure discounted is boolean
+    const isDiscounted = discounted === true || discounted === 'true';
+    product.discounted = discounted !== undefined ? isDiscounted : product.discounted;
+    product.discountPrice = isDiscounted ? discountPrice : undefined;
     const updatedProduct = await product.save();
     res.json(updatedProduct);
   } else {
