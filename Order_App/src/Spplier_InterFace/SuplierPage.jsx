@@ -33,7 +33,7 @@ const SupplierDashboard = () => {
   const [form, setForm] = useState(initialProduct)
   const [editIndex, setEditIndex] = useState(null)
   // const [imgPreview, setImgPreview] = useState('')
-  const [activeTab, setActiveTab] = useState('products')
+  // Removed analytics tab, only product management remains
   const [showForm, setShowForm] = useState(false)
   const [stats] = useState({
     totalProducts: 48,
@@ -126,26 +126,22 @@ const SupplierDashboard = () => {
   }
 
   return (
+
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
       <header className="bg-gradient-to-r from-green-700 to-green-900 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-4 py-7 flex justify-between items-center">
+        {/* ↑ changed py-6 to py-7 for a bit more bottom padding */}
           <div className="flex items-center space-x-4">
             <FiPackage className="text-3xl" />
             <h1 className="text-2xl font-bold">Supplier Portal</h1>
           </div>
           <div className="flex items-center space-x-6">
             <button 
-              onClick={() => { setActiveTab('products'); setShowForm(false); }}
-              className={`px-4 py-2 rounded-lg font-medium ${activeTab === 'products' ? 'bg-white text-green-800' : 'hover:bg-green-600'}`}
+              onClick={() => { setShowForm(false); }}
+              className="px-4 py-2 rounded-lg font-medium bg-white text-green-800"
             >
               My Products
-            </button>
-            <button 
-              onClick={() => { setActiveTab('analytics'); setShowForm(false); }}
-              className={`px-4 py-2 rounded-lg font-medium ${activeTab === 'analytics' ? 'bg-white text-green-800' : 'hover:bg-green-600'}`}
-            >
-              Analytics
             </button>
             <button
               onClick={() => { setShowForm(true); setForm(initialProduct); setEditIndex(null); }}
@@ -162,45 +158,12 @@ const SupplierDashboard = () => {
         </div>
       </header>
 
-      {/* Stats Overview */}
-      <section className="max-w-7xl mx-auto px-4 py-8">
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-4 gap-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ staggerChildren: 0.1 }}
-        >
-          {[
-            { icon: <FiPackage className="text-2xl" />, title: 'Total Products', value: stats.totalProducts },
-            { icon: <FiTag className="text-2xl" />, title: 'Active Orders', value: stats.activeOrders },
-            { icon: <FiDollarSign className="text-2xl" />, title: 'Monthly Revenue', value: stats.monthlyRevenue },
-            { icon: <FiInfo className="text-2xl" />, title: 'Rating', value: `${stats.rating}/5.0` },
-          ].map((stat, index) => (
-            <motion.div 
-              key={index}
-              className="bg-white rounded-xl shadow-md p-6 flex items-center space-x-4"
-              whileHover={{ y: -5, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
-            >
-              <div className="p-3 rounded-lg bg-green-100 text-green-700">
-                {stat.icon}
-              </div>
-              <div>
-                <h3 className="text-gray-500 text-sm font-medium">{stat.title}</h3>
-                <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
       <main className="max-w-7xl mx-auto px-4 pb-16">
-        {activeTab === 'products' ? (
-          <>
-            {/* Product Form */}
-            {showForm && (
+        {/* Product Form */}
+        {showForm && (
               <motion.section
                 initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, y: 10 }}
                 className="bg-white rounded-2xl shadow-xl overflow-hidden mb-12 border border-green-200"
               >
                 <div className="bg-green-700 px-8 py-4 flex justify-between items-center">
@@ -460,24 +423,6 @@ const SupplierDashboard = () => {
                 </div>
               )}
             </section>
-          </>
-        ) : (
-          <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-            <div className="mx-auto h-24 w-24 text-green-500 mb-6">
-              <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Supplier Analytics</h2>
-            <p className="text-gray-600 mb-6">Detailed analytics and performance metrics coming soon!</p>
-            <button 
-              onClick={() => setActiveTab('products')}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-              Back to Products
-            </button>
-          </div>
-        )}
       </main>
 
       {/* Footer */}
