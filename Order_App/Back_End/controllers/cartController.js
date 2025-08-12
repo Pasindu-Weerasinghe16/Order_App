@@ -5,8 +5,9 @@ const Product = require('../models/ProductModel');
 
 // @desc    Get user cart
 // @route   GET /api/cart
+// No user, just use the first cart found (single shared cart)
 const getCart = asyncHandler(async (req, res) => {
-  const cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
+  const cart = await Cart.findOne({}).populate('items.product');
   if (!cart) {
     res.json({ items: [], totalPrice: 0 });
   } else {
@@ -19,10 +20,9 @@ const getCart = asyncHandler(async (req, res) => {
 const addToCart = asyncHandler(async (req, res) => {
   const { productId, quantity } = req.body;
 
-  let cart = await Cart.findOne({ user: req.user._id });
+  let cart = await Cart.findOne({});
   if (!cart) {
     cart = new Cart({
-      user: req.user._id,
       items: [],
       totalPrice: 0
     });

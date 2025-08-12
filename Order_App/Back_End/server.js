@@ -5,6 +5,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 const app = express();
 
 // Improved CORS configuration
@@ -32,6 +33,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', userRoutes);
+app.use('/api/cart', cartRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

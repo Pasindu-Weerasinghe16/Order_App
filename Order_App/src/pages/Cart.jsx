@@ -6,96 +6,60 @@ import { getProducts } from '../api';
 
 const ProductCard = ({ product, onAddToCart }) => {
   return (
-    <div className="rounded-xl shadow-md border p-6 flex items-center gap-6 bg-orange-50 border-orange-200">
-      {/* Left accent bar */}
-      <div className="w-2 h-32 rounded-md bg-orange-600"></div>
-
-      {/* Main content */}
-      <div className="flex-1">
-        <div className="flex items-start justify-between gap-4">
-          {/* Left side */}
-          <div>
-            <div className="flex items-center gap-3">
-              {/* Icon */}
-              <div className="w-12 h-12 rounded-lg bg-white/80 flex items-center justify-center shadow-sm">
-                <svg
-                  stroke="currentColor"
-                  fill="none"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-6 h-6 text-gray-700"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                  <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                  <line x1="12" y1="22.08" x2="12" y2="12" />
-                </svg>
-              </div>
-              {/* Title & Description */}
-              <div>
-                <h3 className="text-slate-900 text-xl font-semibold">{product.name}</h3>
-                <div className="mt-1 text-sm text-slate-600">{product.description}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right badge */}
-          <div className="flex flex-col items-end gap-2">
-            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-700">
-              {product.category}
-            </span>
-          </div>
+    <motion.div
+      className="flex flex-row items-center bg-gradient-to-r from-white via-emerald-50 to-green-100 rounded-2xl shadow-lg border border-emerald-200 px-8 py-6 min-w-[500px] max-w-3xl mx-auto mb-4 hover:shadow-2xl transition-shadow duration-300"
+      whileHover={{ y: -4, scale: 1.01 }}
+    >
+      <div className="flex-1 flex flex-col justify-between">
+        <div className="flex items-center gap-4 mb-2">
+          <h3 className="text-2xl font-bold text-emerald-900 tracking-tight">{product.name}</h3>
+          <button
+            className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all duration-200
+              ${product.discounted
+                ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200 hover:text-amber-900'
+                : 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200 hover:text-emerald-900'}
+            `}
+            disabled
+          >
+            {product.discounted ? 'Discounted' : 'Regular Price'}
+          </button>
         </div>
-
-        {/* Price & Actions */}
-        <div className="mt-6 flex items-center justify-between">
-          <div>
-            <div className="text-lg font-bold text-slate-900">
-              LKR {product.discounted ? product.discountPrice.toFixed(2) : product.price.toFixed(2)}
-              {product.discounted && (
-                <span className="ml-2 text-gray-400 line-through text-base">
-                  LKR {product.price.toFixed(2)}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Add to Cart */}
-            <button
-              onClick={() => onAddToCart(product)}
-              className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg shadow-sm"
-            >
-              <svg
-                stroke="currentColor"
-                fill="none"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-5 h-5"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="9" cy="21" r="1" />
-                <circle cx="20" cy="21" r="1" />
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-              </svg>
-              <span className="font-medium">Add</span>
-            </button>
-
-            {/* View Link */}
-            <Link
-              className="text-sm text-slate-700 underline"
-              to={`/product/${product._id}`}
-            >
-              View
-            </Link>
-          </div>
+        <p className="text-gray-700 text-base mb-3 line-clamp-2">{product.description}</p>
+        <div className="flex items-center gap-4 mt-2">
+          <button
+            className="px-4 py-2 rounded-lg font-bold text-lg border-2 border-emerald-400 bg-white text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all duration-200 shadow-sm"
+            disabled
+          >
+            LKR {product.discounted ? product.discountPrice.toFixed(2) : product.price.toFixed(2)}
+            {product.discounted && (
+              <span className="ml-2 text-gray-400 line-through text-base">LKR {product.price.toFixed(2)}</span>
+            )}
+          </button>
+          <button
+            onClick={() => onAddToCart(product)}
+            className="ml-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-2 rounded-xl font-semibold shadow-md flex items-center gap-2 transition-all duration-200 border-2 border-transparent hover:border-emerald-700"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437m2.35 9.708c-.155.516.232 1.02.772 1.02h12.508a.75.75 0 0 0 .743-.648l1.2-8.4a.75.75 0 0 0-.743-.852H6.28m0 0L5.1 4.272A1.125 1.125 0 0 0 4.013 3.75H2.25m3.75 6.75h13.5m-10.5 4.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm7.5 1.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0z" />
+            </svg>
+            Add to Cart
+          </button>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium capitalize">{product.category}</span>
+          {product.tags && product.tags.map((tag, idx) => (
+            <span key={idx} className="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full text-xs">{tag}</span>
+          ))}
         </div>
       </div>
-    </div>
+
+      {/* Right badge */}
+      <div className="flex flex-col items-end gap-2">
+        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-700">
+          Dairy Products
+        </span>
+      </div>
+    </motion.div>
   );
 };
 
@@ -302,3 +266,46 @@ const ProductPage = () => {
 };
 
 export default ProductPage;
+
+// Cart Item Display (for cartItems.map)
+{cartItems.length === 0 ? (
+  <div className="text-center py-12">
+    <p className="text-xl">Your cart is empty</p>
+  </div>
+) : (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    {cartItems.map((item) => (
+      <motion.div
+        key={item.id}
+        className="flex flex-row items-center bg-gradient-to-r from-white via-emerald-50 to-green-100 rounded-2xl shadow-lg border border-emerald-200 px-8 py-6 min-w-[350px] max-w-3xl mx-auto mb-4 hover:shadow-2xl transition-shadow duration-300"
+        whileHover={{ y: -4, scale: 1.01 }}
+      >
+        <div className="w-20 h-20 rounded-xl bg-white flex items-center justify-center shadow-md border border-emerald-100 mr-6">
+          <svg className="w-10 h-10 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a4 4 0 004 4h10a4 4 0 004-4V7a4 4 0 00-4-4H7a4 4 0 00-4 4z" />
+          </svg>
+        </div>
+        <div className="flex-1 flex flex-col justify-between">
+          <div className="flex items-center gap-4 mb-2">
+            <h3 className="text-2xl font-bold text-emerald-900 tracking-tight">{item.name}</h3>
+            <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium capitalize">{item.category}</span>
+          </div>
+          <p className="text-gray-700 text-base mb-3 line-clamp-2">{item.description}</p>
+          <div className="flex items-center gap-4 mt-2">
+            <span className="text-xl font-extrabold text-emerald-700">LKR {item.price}</span>
+            <div className="flex items-center gap-2 ml-4">
+              <button className="px-2 py-1 bg-emerald-200 rounded-l hover:bg-emerald-300 text-emerald-900 font-bold" onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
+              <span className="px-4 text-lg font-semibold">{item.quantity}</span>
+              <button className="px-2 py-1 bg-emerald-200 rounded-r hover:bg-emerald-300 text-emerald-900 font-bold" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
+              <button className="ml-4 px-2 py-1 bg-red-100 hover:bg-red-200 rounded text-red-600 font-bold" onClick={() => removeItem(item.id)}>
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    ))}
+  </div>
+)}
