@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { createProduct } from '../api';
+import { useState, useEffect } from 'react'
+import { createProduct, getProducts, updateProduct, deleteProduct } from '../api';
 import { motion } from 'framer-motion'
-import { FiUpload, FiEdit2, FiTrash2, FiPlus, FiPackage, FiDollarSign, FiTag, FiInfo } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiPackage, FiDollarSign, FiTag, FiInfo } from 'react-icons/fi'
 
 const initialProduct = {
   name: '',
@@ -34,12 +34,25 @@ const SupplierDashboard = () => {
   const [editIndex, setEditIndex] = useState(null)
   // const [imgPreview, setImgPreview] = useState('')
   const [activeTab, setActiveTab] = useState('products')
+  const [showForm, setShowForm] = useState(false)
   const [stats] = useState({
     totalProducts: 48,
     activeOrders: 12,
     monthlyRevenue: 'LKR 245,800',
     rating: 4.7
   })
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await getProducts();
+        setProducts(res.data);
+      } catch (err) {
+        setProducts([]);
+      }
+    };
+    fetchProducts();
+  }, [])
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,29 +81,47 @@ const SupplierDashboard = () => {
         discounted: !!form.discounted,
         discountPrice: form.discounted ? parseFloat(form.discountPrice) : undefined
       };
-      console.log('Submitting:', productData);
-      const res = await createProduct(productData);
-      setProducts([...products, res.data]);
+      let res;
+      if (editIndex !== null && products[editIndex]?._id) {
+        // Update
+        res = await updateProduct(products[editIndex]._id, productData);
+        const updated = [...products];
+        updated[editIndex] = res.data;
+        setProducts(updated);
+        alert('Product updated successfully!');
+      } else {
+        // Insert
+        res = await createProduct(productData);
+        setProducts([...products, res.data]);
+        alert('Product added successfully!');
+      }
       setForm(initialProduct);
-      alert('Product added successfully!');
+      setEditIndex(null);
+      setShowForm(false);
     } catch (err) {
-      alert('Failed to add product.');
+      alert('Failed to save product.');
     }
   }
 
   const handleEdit = (idx) => {
-    setForm(products[idx])
-    setImgPreview(products[idx].image)
-    setEditIndex(idx)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setForm({ ...products[idx], discountPrice: products[idx].discountPrice || '' });
+    setEditIndex(idx);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  const handleDelete = (idx) => {
-    setProducts(products.filter((_, i) => i !== idx))
-    if (editIndex === idx) {
-      setForm(initialProduct)
-      setImgPreview('')
-      setEditIndex(null)
+  const handleDelete = async (idx) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+    try {
+      await deleteProduct(products[idx]._id);
+      setProducts(products.filter((_, i) => i !== idx));
+      if (editIndex === idx) {
+        setForm(initialProduct);
+        setEditIndex(null);
+        setShowForm(false);
+      }
+    } catch (err) {
+      alert('Failed to delete product.');
     }
   }
 
@@ -105,16 +136,22 @@ const SupplierDashboard = () => {
           </div>
           <div className="flex items-center space-x-6">
             <button 
-              onClick={() => setActiveTab('products')} 
+              onClick={() => { setActiveTab('products'); setShowForm(false); }}
               className={`px-4 py-2 rounded-lg font-medium ${activeTab === 'products' ? 'bg-white text-green-800' : 'hover:bg-green-600'}`}
             >
               My Products
             </button>
             <button 
-              onClick={() => setActiveTab('analytics')} 
+              onClick={() => { setActiveTab('analytics'); setShowForm(false); }}
               className={`px-4 py-2 rounded-lg font-medium ${activeTab === 'analytics' ? 'bg-white text-green-800' : 'hover:bg-green-600'}`}
             >
               Analytics
+            </button>
+            <button
+              onClick={() => { setShowForm(true); setForm(initialProduct); setEditIndex(null); }}
+              className="flex items-center px-4 py-2 rounded-lg font-medium bg-green-500 hover:bg-green-600 text-white"
+            >
+              <FiPlus className="mr-2" /> Add Product
             </button>
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 rounded-full bg-white text-green-800 flex items-center justify-center font-bold">
@@ -160,167 +197,176 @@ const SupplierDashboard = () => {
         {activeTab === 'products' ? (
           <>
             {/* Product Form */}
-            <motion.section
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl shadow-xl overflow-hidden mb-12"
-            >
-              <div className="bg-green-700 px-8 py-4">
-                <h2 className="text-xl font-bold text-white">
-                  {editIndex !== null ? 'Edit Product' : 'Add New Product'}
-                </h2>
-              </div>
-              
-              <form onSubmit={handleSubmit} className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="e.g. Organic Apples"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                    <textarea
-                      name="description"
-                      value={form.description}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      placeholder="Product details, features, etc."
-                      rows={3}
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-6">
+            {showForm && (
+              <motion.section
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-2xl shadow-xl overflow-hidden mb-12 border border-green-200"
+              >
+                <div className="bg-green-700 px-8 py-4 flex justify-between items-center">
+                  <h2 className="text-xl font-bold text-white">
+                    {editIndex !== null ? 'Edit Product' : 'Add New Product'}
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={() => { setShowForm(false); setForm(initialProduct); setEditIndex(null); }}
+                    className="text-white bg-green-900 hover:bg-green-800 px-3 py-1 rounded-lg font-medium"
+                  >
+                    Close
+                  </button>
+                </div>
+                
+                <form onSubmit={handleSubmit} className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                      <select
-                        name="category"
-                        value={form.category}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={form.name}
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        placeholder="e.g. Organic Apples"
                         required
-                      >
-                        <option value="">Select category</option>
-                        {categories.map((cat) => (
-                          <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                      </select>
+                      />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
-                      <select
-                        name="unit"
-                        value={form.unit}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                      <textarea
+                        name="description"
+                        value={form.description}
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      >
-                        {units.map((unit) => (
-                          <option key={unit} value={unit}>{unit}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Price (LKR) *</label>
-                      <input
-                        type="number"
-                        name="price"
-                        value={form.price}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="0.00"
-                        min="0"
-                        step="0.01"
-                        required
+                        placeholder="Product details, features, etc."
+                        rows={3}
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity</label>
-                      <input
-                        type="number"
-                        name="stock"
-                        value={form.stock}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="Available quantity"
-                        min="0"
-                      />
-                    </div>
-                  </div>
-                  {/* Discount Section */}
-                  <div className="grid grid-cols-2 gap-6 mt-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Discounted?</label>
-                      <select
-                        name="discounted"
-                        value={form.discounted ? 'true' : 'false'}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      >
-                        <option value="false">No</option>
-                        <option value="true">Yes</option>
-                      </select>
-                    </div>
-                    {form.discounted && (
+                    
+                    <div className="grid grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Discount Price</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                        <select
+                          name="category"
+                          value={form.category}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          required
+                        >
+                          <option value="">Select category</option>
+                          {categories.map((cat) => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+                        <select
+                          name="unit"
+                          value={form.unit}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        >
+                          {units.map((unit) => (
+                            <option key={unit} value={unit}>{unit}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Price (LKR) *</label>
                         <input
                           type="number"
-                          name="discountPrice"
-                          value={form.discountPrice}
+                          name="price"
+                          value={form.price}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                          placeholder="Discounted price"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          placeholder="0.00"
                           min="0"
                           step="0.01"
                           required
                         />
                       </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity</label>
+                        <input
+                          type="number"
+                          name="stock"
+                          value={form.stock}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          placeholder="Available quantity"
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                    {/* Discount Section */}
+                    <div className="grid grid-cols-2 gap-6 mt-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Discounted?</label>
+                        <select
+                          name="discounted"
+                          value={form.discounted ? 'true' : 'false'}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        >
+                          <option value="false">No</option>
+                          <option value="true">Yes</option>
+                        </select>
+                      </div>
+                      {form.discounted && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Discount Price</label>
+                          <input
+                            type="number"
+                            name="discountPrice"
+                            value={form.discountPrice}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                            placeholder="Discounted price"
+                            min="0"
+                            step="0.01"
+                            required
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col">
+
+                    {/* Image upload removed. You can add a static image to product cards instead. */}
+                    
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      className="mt-auto w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-lg font-bold text-lg transition-all flex items-center justify-center space-x-2"
+                    >
+                      <FiPlus />
+                      <span>{editIndex !== null ? 'Update Product' : 'Add Product'}</span>
+                    </motion.button>
+                    
+                    {editIndex !== null && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForm(initialProduct)
+                          setImgPreview('')
+                          setEditIndex(null)
+                        }}
+                        className="mt-3 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-lg font-medium text-lg transition-colors"
+                      >
+                        Cancel Edit
+                      </button>
                     )}
                   </div>
-                </div>
-                
-                <div className="flex flex-col">
-
-                  {/* Image upload removed. You can add a static image to product cards instead. */}
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    className="mt-auto w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-lg font-bold text-lg transition-all flex items-center justify-center space-x-2"
-                  >
-                    <FiPlus />
-                    <span>{editIndex !== null ? 'Update Product' : 'Add Product'}</span>
-                  </motion.button>
-                  
-                  {editIndex !== null && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setForm(initialProduct)
-                        setImgPreview('')
-                        setEditIndex(null)
-                      }}
-                      className="mt-3 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-lg font-medium text-lg transition-colors"
-                    >
-                      Cancel Edit
-                    </button>
-                  )}
-                </div>
-              </form>
-            </motion.section>
+                </form>
+              </motion.section>
+            )}
 
             {/* Product List */}
             <section>
@@ -359,7 +405,7 @@ const SupplierDashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {products.map((prod, idx) => (
                     <motion.div
-                      key={idx}
+                      key={prod._id || idx}
                       className="bg-white rounded-xl shadow-md overflow-hidden flex flex-col"
                       whileHover={{ y: -5, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
                       layout
@@ -372,12 +418,14 @@ const SupplierDashboard = () => {
                         />
                         <div className="absolute top-3 right-3 flex space-x-2">
                           <button 
+                            type="button"
                             onClick={() => handleEdit(idx)}
                             className="p-2 bg-white rounded-full shadow-md text-green-600 hover:bg-green-50"
                           >
                             <FiEdit2 />
                           </button>
                           <button 
+                            type="button"
                             onClick={() => handleDelete(idx)}
                             className="p-2 bg-white rounded-full shadow-md text-red-600 hover:bg-red-50"
                           >

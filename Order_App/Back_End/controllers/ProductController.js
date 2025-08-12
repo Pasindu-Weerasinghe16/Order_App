@@ -4,7 +4,12 @@ const Product = require('../models/ProductModel');
 // @desc    Get all products
 // @route   GET /api/products
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({});
+  // If user is authenticated, filter by user; else return all (for admin)
+  let filter = {};
+  if (req.user) {
+    filter.user = req.user._id;
+  }
+  const products = await Product.find(filter);
   res.json(products);
 });
 
@@ -15,6 +20,7 @@ const createProduct = asyncHandler(async (req, res) => {
   // Ensure discounted is boolean
   const isDiscounted = discounted === true || discounted === 'true';
   const product = new Product({
+    user: req.user._id,
     name,
     description,
     category,
@@ -34,6 +40,11 @@ const updateProduct = asyncHandler(async (req, res) => {
   const { name, description, category, price, stock, unit, discounted, discountPrice } = req.body;
   const product = await Product.findById(req.params.id);
   if (product) {
+    // Only allow owner to update
+    if (product.user.toString() !== req.user._id.toString()) {
+      res.status(401);
+      throw new Error('Not authorized');
+    }
     product.name = name || product.name;
     product.description = description || product.description;
     product.category = category || product.category;
@@ -56,8 +67,12 @@ const updateProduct = asyncHandler(async (req, res) => {
 // @route   DELETE /api/products/:id
 const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
-
   if (product) {
+    // Only allow owner to delete
+    if (product.user.toString() !== req.user._id.toString()) {
+      res.status(401);
+      throw new Error('Not authorized');
+    }
     await product.remove();
     res.json({ message: 'Product removed' });
   } else {
