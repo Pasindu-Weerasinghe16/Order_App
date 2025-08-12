@@ -10,7 +10,9 @@ const initialProduct = {
   category: '',
   // image: '',
   stock: '',
-  unit: 'kg'
+  unit: 'kg',
+  discounted: false,
+  discountPrice: ''
 }
 
 const categories = [
@@ -57,8 +59,11 @@ const SupplierDashboard = () => {
         category: form.category,
         price: parseFloat(form.price),
         stock: parseInt(form.stock) || 0,
-        unit: form.unit
+        unit: form.unit,
+        discounted: form.discounted,
+        discountPrice: form.discounted ? parseFloat(form.discountPrice) : undefined
       };
+      console.log('Submitting:', productData);
       const res = await createProduct(productData);
       setProducts([...products, res.data]);
       setForm(initialProduct);
@@ -235,7 +240,6 @@ const SupplierDashboard = () => {
                         required
                       />
                     </div>
-                    
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity</label>
                       <input
@@ -248,6 +252,36 @@ const SupplierDashboard = () => {
                         min="0"
                       />
                     </div>
+                  </div>
+                  {/* Discount Section */}
+                  <div className="grid grid-cols-2 gap-6 mt-4">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="discounted"
+                        checked={form.discounted}
+                        onChange={e => setForm(f => ({ ...f, discounted: e.target.checked }))}
+                        className="w-5 h-5 rounded border-gray-400"
+                        id="discounted"
+                      />
+                      <label htmlFor="discounted" className="text-sm font-medium text-gray-700 mb-0">Discounted?</label>
+                    </div>
+                    {form.discounted && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Discount Precentage (%)</label>
+                        <input
+                          type="number"
+                          name="discountPrice"
+                          value={form.discountPrice}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                          placeholder="Discounted price"
+                          min="0"
+                          step="0.01"
+                          required
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
                 

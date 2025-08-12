@@ -11,7 +11,7 @@ const getProducts = asyncHandler(async (req, res) => {
 // @desc    Create a product
 // @route   POST /api/products
 const createProduct = asyncHandler(async (req, res) => {
-  const { name, description, category, price, stock, unit } = req.body;
+  const { name, description, category, price, stock, unit, discounted, discountPrice } = req.body;
 
   const product = new Product({
     name,
@@ -19,7 +19,9 @@ const createProduct = asyncHandler(async (req, res) => {
     category,
     price,
     stock,
-    unit
+    unit,
+    discounted,
+    discountPrice
   });
 
   const createdProduct = await product.save();
@@ -29,7 +31,7 @@ const createProduct = asyncHandler(async (req, res) => {
 // @desc    Update a product
 // @route   PUT /api/products/:id
 const updateProduct = asyncHandler(async (req, res) => {
-  const { name, description, category, price, stock, unit } = req.body;
+  const { name, description, category, price, stock, unit, discounted, discountPrice } = req.body;
 
   const product = await Product.findById(req.params.id);
 
@@ -40,6 +42,8 @@ const updateProduct = asyncHandler(async (req, res) => {
   product.price = price || product.price;
   product.stock = stock || product.stock;
   product.unit = unit || product.unit;
+  product.discounted = discounted !== undefined ? discounted : product.discounted;
+  product.discountPrice = discountPrice !== undefined ? discountPrice : product.discountPrice;
 
     const updatedProduct = await product.save();
     res.json(updatedProduct);
