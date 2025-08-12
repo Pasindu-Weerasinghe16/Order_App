@@ -4,12 +4,8 @@ const Product = require('../models/ProductModel');
 // @desc    Get all products
 // @route   GET /api/products
 const getProducts = asyncHandler(async (req, res) => {
-  // If user is authenticated, filter by user; else return all (for admin)
-  let filter = {};
-  if (req.user) {
-    filter.user = req.user._id;
-  }
-  const products = await Product.find(filter);
+  // No user filter, return all products
+  const products = await Product.find({});
   res.json(products);
 });
 
@@ -17,10 +13,8 @@ const getProducts = asyncHandler(async (req, res) => {
 // @route   POST /api/products
 const createProduct = asyncHandler(async (req, res) => {
   const { name, description, category, price, stock, unit, discounted, discountPrice } = req.body;
-  // Ensure discounted is boolean
   const isDiscounted = discounted === true || discounted === 'true';
   const product = new Product({
-    user: req.user._id,
     name,
     description,
     category,
@@ -40,18 +34,12 @@ const updateProduct = asyncHandler(async (req, res) => {
   const { name, description, category, price, stock, unit, discounted, discountPrice } = req.body;
   const product = await Product.findById(req.params.id);
   if (product) {
-    // Only allow owner to update
-    if (product.user.toString() !== req.user._id.toString()) {
-      res.status(401);
-      throw new Error('Not authorized');
-    }
     product.name = name || product.name;
     product.description = description || product.description;
     product.category = category || product.category;
     product.price = price || product.price;
     product.stock = stock || product.stock;
     product.unit = unit || product.unit;
-    // Ensure discounted is boolean
     const isDiscounted = discounted === true || discounted === 'true';
     product.discounted = discounted !== undefined ? isDiscounted : product.discounted;
     product.discountPrice = isDiscounted ? discountPrice : undefined;
@@ -68,11 +56,6 @@ const updateProduct = asyncHandler(async (req, res) => {
 const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
   if (product) {
-    // Only allow owner to delete
-    if (product.user.toString() !== req.user._id.toString()) {
-      res.status(401);
-      throw new Error('Not authorized');
-    }
     await product.remove();
     res.json({ message: 'Product removed' });
   } else {

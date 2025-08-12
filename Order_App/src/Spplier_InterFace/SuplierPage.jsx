@@ -28,7 +28,7 @@ const categories = [
 
 const units = ['kg', 'g', 'lb', 'oz', 'piece', 'pack', 'liter', 'ml']
 
-const SupplierDashboard = () => {
+const Productes = () => {
   const [products, setProducts] = useState([])
   const [form, setForm] = useState(initialProduct)
   const [editIndex, setEditIndex] = useState(null)
@@ -103,18 +103,22 @@ const SupplierDashboard = () => {
     }
   }
 
-  const handleEdit = (idx) => {
+  const handleEdit = (id) => {
+    const idx = products.findIndex((p) => p._id === id);
+    if (idx === -1) return;
     setForm({ ...products[idx], discountPrice: products[idx].discountPrice || '' });
     setEditIndex(idx);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  const handleDelete = async (idx) => {
+  const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
+    const idx = products.findIndex((p) => p._id === id);
+    if (idx === -1) return;
     try {
-      await deleteProduct(products[idx]._id);
-      setProducts(products.filter((_, i) => i !== idx));
+      await deleteProduct(id);
+      setProducts(products.filter((p) => p._id !== id));
       if (editIndex === idx) {
         setForm(initialProduct);
         setEditIndex(null);
@@ -134,14 +138,14 @@ const SupplierDashboard = () => {
         {/* ↑ changed py-6 to py-7 for a bit more bottom padding */}
           <div className="flex items-center space-x-4">
             <FiPackage className="text-3xl" />
-            <h1 className="text-2xl font-bold">Supplier Portal</h1>
+  <h1 className="text-2xl font-bold">Products</h1>
           </div>
           <div className="flex items-center space-x-6">
             <button 
               onClick={() => { setShowForm(false); }}
               className="px-4 py-2 rounded-lg font-medium bg-white text-green-800"
             >
-              My Products
+              Products
             </button>
             <button
               onClick={() => { setShowForm(true); setForm(initialProduct); setEditIndex(null); }}
@@ -355,7 +359,7 @@ const SupplierDashboard = () => {
                     <FiPackage className="w-full h-full" />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900">No products yet</h3>
-                  <p className="mt-1 text-sm text-gray-500">Get started by adding your first product.</p>
+                  <p className="mt-1 text-sm text-gray-500">Get started by adding your first products.</p>
                   <button
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
@@ -375,21 +379,22 @@ const SupplierDashboard = () => {
                     >
                       <div className="relative h-48 bg-gray-100">
                         <img 
-                          src={prod.image} 
+                          src={prod.image || '/default-product.png'} 
                           alt={prod.name} 
                           className="w-full h-full object-cover"
+                          onError={e => { e.target.onerror = null; e.target.src = '/default-product.png'; }}
                         />
                         <div className="absolute top-3 right-3 flex space-x-2">
                           <button 
                             type="button"
-                            onClick={() => handleEdit(idx)}
+                            onClick={() => handleEdit(prod._id)}
                             className="p-2 bg-white rounded-full shadow-md text-green-600 hover:bg-green-50"
                           >
                             <FiEdit2 />
                           </button>
                           <button 
                             type="button"
-                            onClick={() => handleDelete(idx)}
+                            onClick={() => handleDelete(prod._id)}
                             className="p-2 bg-white rounded-full shadow-md text-red-600 hover:bg-red-50"
                           >
                             <FiTrash2 />
@@ -431,7 +436,7 @@ const SupplierDashboard = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <h3 className="text-xl font-bold flex items-center">
-                <FiPackage className="mr-2" /> Supplier Portal
+                <FiPackage className="mr-2" /> Products
               </h3>
               <p className="text-gray-400 mt-1">© 2023 Order.uk. All rights reserved.</p>
             </div>
@@ -448,4 +453,4 @@ const SupplierDashboard = () => {
   )
 }
 
-export default SupplierDashboard
+export default Productes

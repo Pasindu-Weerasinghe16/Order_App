@@ -6,10 +6,9 @@ const {
   updateProduct,
   deleteProduct
 } = require('../controllers/ProductController');
-const { protect } = require('../middleware/authMiddleware');
 
-
-router.route('/').get(protect, getProducts).post(protect, createProduct);
-router.route('/:id').put(protect, updateProduct).delete(protect, deleteProduct);
+// Public CRUD, no protect middleware
+router.route('/').get(getProducts).post(createProduct);
+router.route('/:id').put(updateProduct).delete(deleteProduct);
 
 module.exports = router;

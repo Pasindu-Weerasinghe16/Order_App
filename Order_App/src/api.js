@@ -8,17 +8,7 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
-// Attach token to every request if it exists
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// No token attached for public endpoints
 
 // Auth API
 export const login = (email, password) => api.post('/auth/login', { email, password });
