@@ -13,65 +13,111 @@ const ProductCard = ({ product, onAddToCart }) => {
     return '0.00';
   };
 
+  const isDiscounted = Boolean(product.discounted);
+  const displayPrice = isDiscounted && product.discountPrice ? product.discountPrice : product.price;
+  const discountPercent = isDiscounted && product.price ? Math.round((1 - (displayPrice / product.price)) * 100) : 0;
+
   return (
     <motion.div
-      className="flex flex-row items-center bg-gradient-to-r from-white via-emerald-50 to-green-100 rounded-2xl shadow-lg border border-emerald-200 px-8 py-6 min-w-[500px] max-w-3xl mx-auto mb-4 hover:shadow-2xl transition-shadow duration-300"
-      whileHover={{ y: -4, scale: 1.01 }}
+      className={
+        // make card take full height of the grid cell so every card matches
+        "relative flex h-full flex-col justify-between bg-gradient-to-r from-white via-amber-50 to-orange-50 rounded-2xl shadow-lg border border-orange-100 p-5 overflow-hidden"
+      }
+      whileHover={{ translateY: -6 }}
     >
-      {/* Product Image */}
-      {product.image && (
-        <img
-          src={product.image.startsWith('http') ? product.image : `http://localhost:5000${product.image}`}
-          alt={product.name}
-          className="w-32 h-32 object-cover rounded-xl mr-8 border"
-        />
-      )}
-      <div className="flex-1 flex flex-col justify-between">
-        <div className="flex items-center gap-4 mb-2">
-          <h3 className="text-2xl font-bold text-emerald-900 tracking-tight">{product.name}</h3>
-          <button
-            className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all duration-200
-              ${product.discounted
-                ? 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200 hover:text-amber-900'
-                : 'bg-emerald-100 text-emerald-700 border-emerald-300 hover:bg-emerald-200 hover:text-emerald-900'}
-            `}
-            disabled
-          >
-            {product.discounted ? 'Discounted' : 'Regular Price'}
-          </button>
-        </div>
-        <p className="text-gray-700 text-base mb-3 line-clamp-2">{product.description}</p>
-        <div className="flex items-center gap-4 mt-2">
-          <button
-            className="px-4 py-2 rounded-lg font-bold text-lg border-2 border-emerald-400 bg-white text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all duration-200 shadow-sm"
-            disabled
-          >
-            LKR {product.discounted ? formatPrice(product.discountPrice) : formatPrice(product.price)}
-            {product.discounted && (
-              <span className="ml-2 text-gray-400 line-through text-base">
-                LKR {formatPrice(product.price)}
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => onAddToCart(product)}
-            className="ml-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-2 rounded-xl font-semibold shadow-md flex items-center gap-2 transition-all duration-200 border-2 border-transparent hover:border-emerald-700"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437m2.35 9.708c-.155.516.232 1.02.772 1.02h12.508a.75.75 0 0 0 .743-.648l1.2-8.4a.75.75 0 0 0-.743-.852H6.28m0 0L5.1 4.272A1.125 1.125 0 0 0 4.013 3.75H2.25m3.75 6.75h13.5m-10.5 4.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm7.5 1.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0z" />
+      {/* Decorative left accent bar */}
+      <div className="absolute left-0 top-0 h-full w-2 rounded-l-2xl bg-gradient-to-b from-orange-400 to-amber-400" />
+
+      <div className="flex items-start gap-4">
+        {/* Product Image (fixed size) */}
+        <div className="flex-shrink-0 w-28 h-28 rounded-lg overflow-hidden bg-orange-50 border border-orange-100 flex items-center justify-center">
+          {product.image ? (
+            <img
+              src={product.image.startsWith('http') ? product.image : `http://localhost:5000${product.image}`}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <svg className="w-12 h-12 text-orange-200" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 3.5a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
-            Add to Cart
-          </button>
+          )}
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium capitalize">{product.category}</span>
-          {product.tags && product.tags.map((tag, idx) => (
-            <span key={idx} className="bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full text-xs">{tag}</span>
-          ))}
+
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="text-lg md:text-xl font-semibold text-orange-900 truncate">{product.name}</h3>
+              <p className="text-sm text-gray-600 mt-1 line-clamp-3">{product.description || 'Fresh & high quality.'}</p>
+
+              <div className="mt-3 flex items-center gap-3">
+                <div className="inline-flex items-baseline gap-2">
+                  <span className="text-orange-700 font-extrabold text-lg">LKR {formatPrice(displayPrice)}</span>
+                  {isDiscounted && (
+                    <span className="text-gray-400 line-through text-sm">LKR {formatPrice(product.price)}</span>
+                  )}
+                </div>
+
+                {/* small badges */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full font-medium capitalize">{product.category || 'General'}</span>
+                  {product.tags && product.tags.length > 0 && (
+                    <span className="text-xs bg-white/60 text-gray-700 px-2 py-1 rounded-full">{product.tags[0]}</span>
+                  )}
+                  {isDiscounted && discountPercent > 0 && (
+                    <span className="text-xs bg-amber-100 text-amber-900 px-2 py-1 rounded-full font-semibold">-{discountPercent}%</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right column: quick info & Add */}
+            <div className="flex flex-col items-end justify-between ml-2">
+              <div className="flex items-center gap-2">
+                {product.stock !== undefined && (
+                  <div
+                    className={`text-xs font-medium px-2 py-1 rounded-full ${
+                      product.stock > 10 ? 'bg-emerald-50 text-emerald-800 border border-emerald-100' :
+                      product.stock > 3 ? 'bg-amber-50 text-amber-800 border border-amber-100' :
+                      'bg-red-50 text-red-700 border border-red-100'
+                    }`}
+                  >
+                    {product.stock > 10 ? 'In stock' : product.stock > 3 ? 'Low stock' : 'Almost gone'}
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 flex items-center gap-3">
+                <button
+                  className="px-3 py-1 rounded-lg text-sm font-semibold border border-orange-200 bg-white text-orange-700 shadow-sm"
+                  disabled
+                  aria-hidden
+                >
+                  LKR {formatPrice(displayPrice)}
+                </button>
+
+                <button
+                  onClick={() => onAddToCart(product)}
+                  className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-4 py-2 rounded-xl font-semibold shadow-md transition-transform active:scale-95"
+                  aria-label={`Add ${product.name} to cart`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
+                    <circle cx="10" cy="19" r="1" />
+                    <circle cx="18" cy="19" r="1" />
+                  </svg>
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-     
+      {/* subtle right label */}
+      <div className="absolute right-3 top-3 rounded px-2 py-0.5 bg-white/40 text-xs text-gray-600 border border-white/30">SuperMart</div>
     </motion.div>
   );
 };
@@ -249,14 +295,16 @@ const ProductPage = () => {
         </div>
 
         {/* Products Grid */}
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* auto-rows-fr ensures every grid cell gets equal height; product cards use h-full */}
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8 auto-rows-fr">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
-              <ProductCard 
-                key={product._id}
-                product={product}
-                onAddToCart={handleAddToCart}
-              />
+              <div key={product._id} className="h-full">
+                <ProductCard 
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                />
+              </div>
             ))
           ) : (
             <div className="col-span-2 text-center py-12">
