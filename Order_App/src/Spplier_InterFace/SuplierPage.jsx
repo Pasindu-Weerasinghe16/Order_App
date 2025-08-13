@@ -414,9 +414,9 @@ const Productes = () => {
                       layout
                     >
                       <div className="relative h-48 bg-gray-100">
-                        <img 
-                          src={prod.image || '/default-product.png'} 
-                          alt={prod.name} 
+                        <img
+                          src={prod.image ? (prod.image.startsWith('http') ? prod.image : `http://localhost:5000${prod.image}`) : '/default-product.png'}
+                          alt={prod.name}
                           className="w-full h-full object-cover"
                           onError={e => { e.target.onerror = null; e.target.src = '/default-product.png'; }}
                         />
