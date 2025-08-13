@@ -1,15 +1,75 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FaMapMarkerAlt, FaShoppingCart, FaChevronDown, FaUser, FaBell, FaSearch } from 'react-icons/fa'
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+
+const CART_KEY = 'supermart_cart_v1'
+
+const readCartFromStorage = () => {
+  try {
+    const raw = localStorage.getItem(CART_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch (e) {
+    console.error('Failed to parse cart from storage', e)
+    return []
+  }
+}
 
 const NavBarCart = () => {
   const location = useLocation()
-  
+  const navigate = useNavigate()
+
+  // cart derived values
+  const [cart, setCart] = useState(() => readCartFromStorage())
+  const [itemCount, setItemCount] = useState(0)
+  const [totalPrice, setTotalPrice] = useState(0)
+
+  useEffect(() => {
+    const calc = (c) => {
+      const count = (c || []).reduce((s, it) => s + (it.quantity || 0), 0)
+      const total = (c || []).reduce((s, it) => s + ((it.product?.price || 0) * (it.quantity || 0)), 0)
+      setItemCount(count)
+      setTotalPrice(total)
+    }
+
+    // initial calc
+    calc(cart)
+
+    // handler for custom event from other parts of app (ProductPage)
+    const onCartUpdated = (e) => {
+      const newCart = e?.detail ?? readCartFromStorage()
+      setCart(newCart)
+      calc(newCart)
+    }
+    window.addEventListener('cart_updated', onCartUpdated)
+
+    // storage event (other tabs)
+    const onStorage = (ev) => {
+      if (ev.key === CART_KEY) {
+        const newCart = readCartFromStorage()
+        setCart(newCart)
+        calc(newCart)
+      }
+    }
+    window.addEventListener('storage', onStorage)
+
+    return () => {
+      window.removeEventListener('cart_updated', onCartUpdated)
+      window.removeEventListener('storage', onStorage)
+    }
+  }, []) // run once
+
+  // helper to format LKR
+  const fmt = (n) => `LKR ${Number(n || 0).toFixed(2)}`
+
+  // navigate to cart page
+  const goToCart = () => navigate('/cart-page')
+
   return (
     <>
-      {/* Top Navigation Bar */}
+      {/* Top Navigation Bar background */}
       <div className="w-[1528px] h-16 left-[196px] top-[26px] absolute bg-neutral-50 rounded-bl-xl rounded-br-xl border border-black/10" />
-      
+
       {/* Location Section */}
       <motion.div 
         className="left-[862px] top-[49px] absolute justify-start"
@@ -19,7 +79,7 @@ const NavBarCart = () => {
         <span className="text-slate-950 text-base font-medium font-['Poppins'] underline">A4</span>
         <span className="text-slate-950 text-base font-medium font-['Poppins']">, A4201, London</span>
       </motion.div>
-      
+
       <motion.div 
         className="left-[1120px] top-[51px] absolute justify-start text-amber-500 text-sm font-medium font-['Poppins'] underline"
         whileHover={{ scale: 1.1 }}
@@ -27,22 +87,38 @@ const NavBarCart = () => {
       >
         Change Location
       </motion.div>
-      
+
       <FaMapMarkerAlt className="w-6 h-6 left-[823px] top-[48px] absolute text-gray-700" />
-      
-      {/* Cart Section */}
-      <div className="w-96 h-16 left-[1357px] top-[26px] absolute bg-green-700 rounded-bl-xl rounded-br-xl border border-black/10" />
-      <FaShoppingCart className="w-6 h-6 left-[1381px] top-[41px] absolute text-white" />
-      
+
+      {/* -------------------------
+          Cart Section (functional)
+          ------------------------- */}
+
+      {/* Cart Section (icon, items, price) */}
+      <div
+        role="button"
+        onClick={goToCart}
+        className="w-[400px] h-16 left-[1357px] top-[26px] absolute bg-green-700 rounded-bl-xl rounded-br-xl border border-black/10 cursor-pointer flex items-center justify-between px-18 shadow-lg hover:bg-green-800 transition-colors"
+        title="Go to cart"
+      >
+        <div className="flex items-center gap-4">
+          <FaShoppingCart className="w-8 h-8 text-white" />
+          <span className="text-white text-lg font-semibold font-['Poppins']">
+            {itemCount} {itemCount === 1 ? 'Item' : 'Items'}
+          </span>
+        </div>
+        <span className="text-white text-lg font-bold font-['Poppins'] tracking-wide ml-4">
+          {fmt(totalPrice)}
+        </span>
+      </div>
+
+      {/* Vertical dividers (kept as in your original layout) */}
       <div className="w-16 h-0 left-[1434px] top-[26px] absolute origin-top-left rotate-90 opacity-30 outline outline-1 outline-offset-[-0.50px] outline-white"></div>
       <div className="w-16 h-0 left-[1546px] top-[26px] absolute origin-top-left rotate-90 opacity-30 outline outline-1 outline-offset-[-0.50px] outline-white"></div>
       <div className="w-16 h-0 left-[1662px] top-[26px] absolute origin-top-left rotate-90 opacity-30 outline outline-1 outline-offset-[-0.50px] outline-white"></div>
-      
-      <div className="left-[1564px] top-[49px] absolute justify-start text-white text-base font-semibold font-['Poppins']">LKR 90.5</div>
-      <div className="left-[1455px] top-[49px] absolute justify-start text-white text-base font-semibold font-['Poppins']">23 Items</div>
-      
+
       <FaChevronDown className="w-5 h-5 left-[1710px] top-[43px] absolute text-white transform -rotate-90" />
-      
+
       {/* Logo */}
       <motion.div 
         className="w-44 h-14 left-[128px] top-[122px] absolute bg-gray-800 text-white flex items-center justify-center text-xl font-bold rounded"
@@ -52,7 +128,7 @@ const NavBarCart = () => {
       >
         Order
       </motion.div>
-      
+
       {/* Navigation Links */}
       <div className="left-[547px] top-[135px] absolute justify-start flex items-center gap-7">
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -84,7 +160,7 @@ const NavBarCart = () => {
           </Link>
         </motion.div>
       </div>
-      
+
       {/* Login and Signup Buttons */}
       <div className="flex items-center gap-3 absolute left-[1422px] top-[118px]">
         <motion.button
@@ -102,7 +178,7 @@ const NavBarCart = () => {
           Signup
         </motion.button>
       </div>
-      
+
       {/* Notification and Profile */}
       <div className="w-28 h-12 left-[1684px] top-[129px] absolute inline-flex justify-start items-center gap-7">
         <motion.div 
@@ -117,7 +193,7 @@ const NavBarCart = () => {
             transition={{ repeat: Infinity, duration: 1.5 }}
           />
         </motion.div>
-        
+
         <motion.div 
           className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold"
           whileHover={{ scale: 1.1 }}
