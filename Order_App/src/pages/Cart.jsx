@@ -18,6 +18,14 @@ const ProductCard = ({ product, onAddToCart }) => {
       className="flex flex-row items-center bg-gradient-to-r from-white via-emerald-50 to-green-100 rounded-2xl shadow-lg border border-emerald-200 px-8 py-6 min-w-[500px] max-w-3xl mx-auto mb-4 hover:shadow-2xl transition-shadow duration-300"
       whileHover={{ y: -4, scale: 1.01 }}
     >
+      {/* Product Image */}
+      {product.image && (
+        <img
+          src={product.image.startsWith('http') ? product.image : `http://localhost:5000${product.image}`}
+          alt={product.name}
+          className="w-32 h-32 object-cover rounded-xl mr-8 border"
+        />
+      )}
       <div className="flex-1 flex flex-col justify-between">
         <div className="flex items-center gap-4 mb-2">
           <h3 className="text-2xl font-bold text-emerald-900 tracking-tight">{product.name}</h3>
