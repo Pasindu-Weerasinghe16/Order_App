@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getProducts, createOrder, getMyOrders } from '../api';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 /* --- Local storage helpers (same key as ProductPage) --- */
 const CART_KEY = 'supermart_cart_v1';
@@ -203,7 +204,15 @@ const CartPage = () => {
               </div>
 
               {cart.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">Your cart is empty. Visit the Products page to add items.</div>
+                <div className="text-center py-12 text-gray-500">
+                  <div className="mb-4">Your cart is empty.</div>
+                  <Link
+                    to="/product"
+                    className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
+                  >
+                    Go to Products Page
+                  </Link>
+                </div>
               ) : (
                 <div className="space-y-4">
                   {cart.map(item => (
@@ -258,7 +267,7 @@ const CartPage = () => {
                 <div className="text-gray-500 text-sm">No orders yet.</div>
               ) : (
                 <ul className="space-y-3">
-                  {orders.slice(0, 5).map(o => (
+                  {[...orders].reverse().slice(0, 5).map(o => (
                     <li key={o._id} className="text-sm border rounded p-2">
                       <div className="flex justify-between items-center">
                         <div className="font-medium">Order #{o._id.slice(-6)}</div>
