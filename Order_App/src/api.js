@@ -22,12 +22,21 @@ export const getProfile = () => api.get('/auth/profile');
 export const getProducts = (category, discounted) => 
   api.get('/products', { params: { category, discounted } });
 export const getProductById = (id) => api.get(`/products/${id}`);
-export const createProduct = (productData) => api.post('/products', productData);
+// (Removed duplicate createProduct export)
 export const updateProduct = (id, productData) => api.put(`/products/${id}`, productData);
 export const deleteProduct = (id) => api.delete(`/products/${id}`);
 export const getFlashSaleProducts = () => api.get('/products/flash-sale');
 
 // Cart API
+export const createProduct = (productData) => {
+  // If productData is FormData, send as multipart/form-data
+  if (productData instanceof FormData) {
+    return api.post('/products', productData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  }
+  return api.post('/products', productData);
+};
 export const getCart = () => api.get('/cart');
 export const addToCart = (productId, quantity) => api.post('/cart', { productId, quantity });
 export const updateCartItem = (itemId, quantity) => api.put(`/cart/${itemId}`, { quantity });

@@ -32,7 +32,8 @@ const Productes = () => {
   const [products, setProducts] = useState([])
   const [form, setForm] = useState(initialProduct)
   const [editIndex, setEditIndex] = useState(null)
-  // const [imgPreview, setImgPreview] = useState('')
+  const [imageFile, setImageFile] = useState(null);
+  const [imgPreview, setImgPreview] = useState('');
   // Removed analytics tab, only product management remains
   const [showForm, setShowForm] = useState(false)
   const [stats] = useState({
@@ -69,33 +70,55 @@ const Productes = () => {
     if (!form.name || !form.price || !form.category) {
       alert('Please fill in all required fields.');
       return;
+  const categories = [
+    'Fruits & Vegetables',
+    'Snacks & Beverages',
+    'Meat & Seafood',
+    'Canned & Packaged Goods',
+    'Bakery Items',
+    'Dairy Products',
+    'Organic Foods',
+    'Frozen Foods'
+  ]
     }
     try {
-      const productData = {
-        name: form.name,
-        description: form.description,
-        category: form.category,
-        price: parseFloat(form.price),
-        stock: parseInt(form.stock) || 0,
-        unit: form.unit,
-        discounted: !!form.discounted,
-        discountPrice: form.discounted ? parseFloat(form.discountPrice) : undefined
-      };
       let res;
       if (editIndex !== null && products[editIndex]?._id) {
-        // Update
+        // Update (no image upload for update in this logic)
+        const productData = {
+          name: form.name,
+          description: form.description,
+          category: form.category,
+          price: parseFloat(form.price),
+          stock: parseInt(form.stock) || 0,
+          unit: form.unit,
+          discounted: !!form.discounted,
+          discountPrice: form.discounted ? parseFloat(form.discountPrice) : undefined
+        };
         res = await updateProduct(products[editIndex]._id, productData);
         const updated = [...products];
         updated[editIndex] = res.data;
         setProducts(updated);
         alert('Product updated successfully!');
       } else {
-        // Insert
-        res = await createProduct(productData);
+        // Insert with image
+        const formData = new FormData();
+        formData.append('name', form.name);
+        formData.append('description', form.description);
+        formData.append('category', form.category);
+        formData.append('price', parseFloat(form.price));
+        formData.append('stock', parseInt(form.stock) || 0);
+        formData.append('unit', form.unit);
+        formData.append('discounted', !!form.discounted);
+        if (form.discounted) formData.append('discountPrice', parseFloat(form.discountPrice));
+        if (imageFile) formData.append('image', imageFile);
+        res = await createProduct(formData);
         setProducts([...products, res.data]);
         alert('Product added successfully!');
       }
       setForm(initialProduct);
+      setImageFile(null);
+      setImgPreview('');
       setEditIndex(null);
       setShowForm(false);
     } catch (err) {
@@ -304,9 +327,22 @@ const Productes = () => {
                   </div>
                   
                   <div className="flex flex-col">
-
-                    {/* Image upload removed. You can add a static image to product cards instead. */}
-                    
+                    {/* Image upload input */}
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={e => {
+                        const file = e.target.files[0];
+                        setImageFile(file);
+                        if (file) setImgPreview(URL.createObjectURL(file));
+                        else setImgPreview('');
+                      }}
+                      className="mb-4"
+                    />
+                    {imgPreview && (
+                      <img src={imgPreview} alt="Preview" className="mb-4 rounded-lg border w-32 h-32 object-cover" />
+                    )}
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -316,13 +352,13 @@ const Productes = () => {
                       <FiPlus />
                       <span>{editIndex !== null ? 'Update Product' : 'Add Product'}</span>
                     </motion.button>
-                    
                     {editIndex !== null && (
                       <button
                         type="button"
                         onClick={() => {
                           setForm(initialProduct)
                           setImgPreview('')
+                          setImageFile(null)
                           setEditIndex(null)
                         }}
                         className="mt-3 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-lg font-medium text-lg transition-colors"

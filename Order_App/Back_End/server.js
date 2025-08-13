@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -19,6 +20,9 @@ const corsOptions = {
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve uploads folder statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Handle preflight requests
 // app.options('*', cors(corsOptions));

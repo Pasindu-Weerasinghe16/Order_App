@@ -14,6 +14,11 @@ const getProducts = asyncHandler(async (req, res) => {
 const createProduct = asyncHandler(async (req, res) => {
   const { name, description, category, price, stock, unit, discounted, discountPrice } = req.body;
   const isDiscounted = discounted === true || discounted === 'true';
+  let imageUrl = '';
+  if (req.file) {
+    // The image will be served at /uploads/filename
+    imageUrl = `/uploads/${req.file.filename}`;
+  }
   const product = new Product({
     name,
     description,
@@ -21,6 +26,7 @@ const createProduct = asyncHandler(async (req, res) => {
     price,
     stock,
     unit,
+    image: imageUrl,
     discounted: isDiscounted,
     discountPrice: isDiscounted ? discountPrice : undefined
   });
