@@ -31,6 +31,9 @@ const CartPage = () => {
   const [receipt, setReceipt] = useState(null); // receipt object shown after checkout
   const [processing, setProcessing] = useState(false);
 
+  // NEW: selected order for "view" modal
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
   useEffect(() => {
     // load cart from storage
     setCart(getCartFromStorage());
@@ -173,6 +176,43 @@ const CartPage = () => {
 
   const fmt = (n) => `LKR ${Number(n || 0).toFixed(2)}`;
 
+  // ---------- Recent Orders helpers (NEW) ----------
+  // show last 10 orders (most recent first)
+  const last10Orders = [...(orders || [])].reverse().slice(0, 10);
+
+  const statusMeta = (status) => {
+    const s = (status || '').toString().toLowerCase();
+    if (s.includes('process') || s === 'processing') return { label: 'Processing', color: 'bg-amber-100 text-amber-800' };
+    if (s.includes('fail') || s === 'failed' || s === 'error') return { label: 'Failed', color: 'bg-red-100 text-red-700' };
+    return { label: 'Placed', color: 'bg-emerald-100 text-emerald-800' };
+  };
+
+  const renderOrderThumbnails = (order) => {
+    if (!order.items || order.items.length === 0) return null;
+    const thumbs = order.items.slice(0, 3).map((it, idx) => {
+      const p = it.product || {};
+      const src = p.image ? (p.image.startsWith('http') ? p.image : `http://localhost:5000${p.image}`) : null;
+      return (
+        <div key={idx} className="w-10 h-10 rounded-md overflow-hidden border border-gray-100">
+          {src ? <img src={src} alt={p.name} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gray-100" />}
+        </div>
+      );
+    });
+    const extra = order.items.length > 3 ? order.items.length - 3 : 0;
+    return (
+      <div className="flex items-center -space-x-2">
+        {thumbs}
+        {extra > 0 && (
+          <div className="w-10 h-10 rounded-md bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-semibold text-gray-700">
+            +{extra}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const shortId = (id) => (id ? `#${String(id).slice(-6)}` : '');
+
   return (
     <div className="min-h-screen w-full relative bg-white overflow-hidden">
       {showAlert && (
@@ -257,31 +297,64 @@ const CartPage = () => {
               )}
             </div>
 
-            {/* Order history kept as-is (right now simple list) */}
+            {/* -------------------------
+                REPLACED: Recent Orders (creative timeline)
+                This block replaces the previous simple list and sits exactly here.
+                Shows last 10 orders (most recent first).
+               ------------------------- */}
             <div className="bg-white rounded-2xl border p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <div className="font-bold">Recent Orders</div>
                 <div className="text-sm text-gray-500">{orders.length}</div>
               </div>
-              {orders.length === 0 ? (
+
+              {last10Orders.length === 0 ? (
                 <div className="text-gray-500 text-sm">No orders yet.</div>
               ) : (
-                <ul className="space-y-3">
-                  {[...orders].reverse().slice(0, 5).map(o => (
-                    <li key={o._id} className="text-sm border rounded p-2">
-                      <div className="flex justify-between items-center">
-                        <div className="font-medium">Order #{o._id.slice(-6)}</div>
-                        <div className="text-xs text-gray-500">{new Date(o.createdAt).toLocaleString()}</div>
-                      </div>
-                      <div className="text-gray-600 mt-1">Total: <span className="font-semibold">{fmt(o.totalPrice)}</span></div>
-                    </li>
-                  ))}
-                </ul>
+                <div className="space-y-4 relative pl-6">
+                  <div className="absolute left-3 top-2 bottom-2 w-px bg-gray-200" />
+                  {last10Orders.map((order, idx) => {
+                    const meta = statusMeta(order.status);
+                    return (
+                      <motion.div key={order._id || idx} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.04 }} className="relative mb-6">
+                        <div className="absolute left-0 top-2">
+                          <div className="w-5 h-5 rounded-full bg-white border-2 border-amber-400 flex items-center justify-center text-xs font-bold text-amber-600 shadow-sm">
+                            {idx + 1}
+                          </div>
+                        </div>
+
+                        <div className="ml-8 bg-gradient-to-r from-white to-amber-50 border border-amber-100 p-4 rounded-xl shadow-sm flex justify-between items-start gap-4">
+                          <div className="flex items-start gap-3 min-w-0">
+                            <div className="flex-shrink-0">
+                              {renderOrderThumbnails(order)}
+                            </div>
+
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <div className="font-semibold text-gray-800 truncate">{shortId(order._id)} • {order.items?.length || 0} item(s)</div>
+                                <div className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${meta.color}`}>{meta.label}</div>
+                              </div>
+                              <div className="text-sm text-gray-500 mt-1 truncate">{new Date(order.createdAt).toLocaleString()}</div>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col items-end gap-3">
+                            <div className="font-bold text-gray-900">{fmt(order.totalPrice)}</div>
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => setSelectedOrder(order)} className="text-sm px-3 py-1 rounded-lg bg-amber-500 text-white">View</button>
+                              <button onClick={() => { navigator.clipboard?.writeText(JSON.stringify(order)); setAlertMessage('Order copied to clipboard'); setShowAlert(true); setTimeout(() => setShowAlert(false), 1600); }} className="text-sm px-3 py-1 rounded-lg border">Copy</button>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
 
-          {/* Right: Summary & Checkout */}
+          {/* Right: Summary & Checkout (unchanged) */}
           <div>
             <div className="bg-white rounded-2xl shadow-lg border border-amber-50 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -306,7 +379,7 @@ const CartPage = () => {
         </div>
       </div>
 
-      {/* Receipt Modal */}
+      {/* Receipt Modal (checkout result) */}
       {receipt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6">
@@ -352,12 +425,67 @@ const CartPage = () => {
                     <button onClick={() => { setReceipt(null); }} className="px-4 py-2 bg-emerald-600 text-white rounded-lg">Close</button>
                   )}
                   {receipt.status === 'processing' && (
-                    <button onClick={() => { /* allow user to cancel view */ setReceipt(null); }} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg">Close</button>
+                    <button onClick={() => { setReceipt(null); }} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg">Close</button>
                   )}
                   {receipt.status === 'failed' && (
                     <button onClick={() => setReceipt(null)} className="px-4 py-2 bg-red-500 text-white rounded-lg">Close</button>
                   )}
                 </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Order Detail Modal (when user clicks "View" on a recent order) */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
+          <motion.div initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-6 max-h-[85vh] overflow-auto">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-lg font-bold">Order {shortId(selectedOrder._id)}</div>
+                <div className="text-sm text-gray-500">{new Date(selectedOrder.createdAt).toLocaleString()}</div>
+              </div>
+              <button onClick={() => setSelectedOrder(null)} className="text-gray-500">Close ✕</button>
+            </div>
+
+            <div className="mt-4 divide-y">
+              <div className="py-4">
+                {(selectedOrder.items || []).map((it, i) => {
+                  const p = it.product || {};
+                  return (
+                    <div key={i} className="flex items-center justify-between gap-4 py-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {p.image && (
+                          <div className="w-14 h-14 rounded-md overflow-hidden">
+                            <img src={p.image.startsWith('http') ? p.image : `http://localhost:5000${p.image}`} alt={p.name} className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <div className="font-medium truncate">{p.name}</div>
+                          <div className="text-sm text-gray-500">{p.category || 'General'}</div>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="font-semibold">{fmt((p.price || it.price || 0) * (it.quantity || 1))}</div>
+                        <div className="text-sm text-gray-500">{it.quantity} × {fmt(p.price || it.price || 0)}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="py-4">
+                <div className="flex justify-between text-sm text-gray-600 mb-1"><span>Subtotal</span><span>{fmt(selectedOrder.items.reduce((s,it)=>(s + ((it.product?.price || it.price || 0) * (it.quantity || 0))),0))}</span></div>
+                <div className="flex justify-between text-sm text-gray-600 mb-1"><span>Delivery</span><span>{fmt(selectedOrder.delivery || 250)}</span></div>
+                <div className="flex justify-between text-sm text-emerald-600 mb-1"><span>Discount</span><span>-{fmt((selectedOrder.items.reduce((s,it)=>(s + ((it.product?.price || it.price || 0) * (it.quantity || 0))),0)) * 0.02)}</span></div>
+                <div className="flex justify-between font-bold text-lg mt-2"><span>Total</span><span>{fmt(selectedOrder.totalPrice)}</span></div>
+              </div>
+
+              <div className="py-4 flex justify-end gap-3">
+                <button onClick={() => { navigator.clipboard?.writeText(JSON.stringify(selectedOrder)); setAlertMessage('Order copied'); setShowAlert(true); setTimeout(()=>setShowAlert(false),1500); }} className="px-4 py-2 border rounded-lg">Copy JSON</button>
+                <button onClick={() => setSelectedOrder(null)} className="px-4 py-2 bg-amber-500 text-white rounded-lg">Close</button>
               </div>
             </div>
           </motion.div>
