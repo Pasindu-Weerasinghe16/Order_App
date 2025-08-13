@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import FlashSaleNavBar from '../components/FlashSaleNavBar';
 
+
 const CART_KEY = 'supermart_cart_v1';
 const readCartFromStorage = () => {
   try {
@@ -34,7 +35,7 @@ const FlashSalePage = () => {
       price: 499.0,            // LKR
       original: 699.0,
       discountLabel: '30% OFF',
-      image: '/strawberries.jpg',
+      image: '/Assets/Flash_sale_01.jpg', // match the actual filename and folder case
       stock: 12,
     },
     {
@@ -43,7 +44,7 @@ const FlashSalePage = () => {
       price: 899.0,
       original: 1299.0,
       discountLabel: '30% OFF',
-      image: '/beef.jpg',
+      image: '/Assets/Flash_sale_02.webp',
       stock: 6,
     },
     {
@@ -52,7 +53,7 @@ const FlashSalePage = () => {
       price: 599.0,
       original: 799.0,
       discountLabel: '25% OFF',
-      image: '/bread.jpg',
+      image: '/Assets/Flash_sale_03.jpg',
       stock: 18,
     },
     {
@@ -61,7 +62,7 @@ const FlashSalePage = () => {
       price: 149.0,
       original: 249.0,
       discountLabel: '40% OFF',
-      image: '/avocados.jpg',
+      image: '/Assets/Flash_sale_04.jpg',
       stock: 4,
     },
     {
@@ -70,7 +71,7 @@ const FlashSalePage = () => {
       price: 1299.0,
       original: 1699.0,
       discountLabel: '24% OFF',
-      image: '/salmon.jpg',
+      image: '/Assets/Flash_sale_05.jpg',
       stock: 8,
     },
     {
@@ -79,7 +80,7 @@ const FlashSalePage = () => {
       price: 349.0,
       original: 499.0,
       discountLabel: '30% OFF',
-      image: '/coffee.jpg',
+      image: '/Assets/Flash_sale_06.webp',
       stock: 25,
     },
     {
@@ -88,7 +89,7 @@ const FlashSalePage = () => {
       price: 299.0,
       original: 399.0,
       discountLabel: '25% OFF',
-      image: '/yogurt.jpg',
+      image: '/Assets/Flash_sale_07.webp',
       stock: 15,
     },
     {
@@ -97,7 +98,7 @@ const FlashSalePage = () => {
       price: 599.0,
       original: 799.0,
       discountLabel: '25% OFF',
-      image: '/eggs.jpg',
+      image: '/Assets/Flash_sale_08.webp',
       stock: 20,
     }
   ]);
