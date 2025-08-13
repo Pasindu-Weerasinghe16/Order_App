@@ -4,32 +4,41 @@ import { Link } from 'react-router-dom';
 import NavBarCart from '../components/NavBarCart';
 import { getProducts } from '../api';
 
-const ProductCard = ({ product, onAddToCart }) => {
-  // Helper to safely format price
-  const formatPrice = (price) => {
-    if (typeof price === 'number' && !isNaN(price)) {
-      return price.toFixed(2);
-    }
-    return '0.00';
-  };
+/* --- Local storage helpers (shared) --- */
+const CART_KEY = 'supermart_cart_v1';
+const getCartFromStorage = () => {
+  try {
+    const raw = localStorage.getItem(CART_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+};
+const saveCartToStorage = (cart) => {
+  try {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    // dispatch custom event so other components can respond immediately
+    window.dispatchEvent(new CustomEvent('cart_updated', { detail: cart }));
+  } catch (e) {
+    console.error('Failed to save cart', e);
+  }
+};
 
+/* --- Product Card (orange theme, uniform height) --- */
+const ProductCard = ({ product, onAddToCart }) => {
+  const formatPrice = (price) => (typeof price === 'number' && !isNaN(price) ? price.toFixed(2) : '0.00');
   const isDiscounted = Boolean(product.discounted);
   const displayPrice = isDiscounted && product.discountPrice ? product.discountPrice : product.price;
   const discountPercent = isDiscounted && product.price ? Math.round((1 - (displayPrice / product.price)) * 100) : 0;
 
   return (
     <motion.div
-      className={
-        // make card take full height of the grid cell so every card matches
-        "relative flex h-full flex-col justify-between bg-gradient-to-r from-white via-amber-50 to-orange-50 rounded-2xl shadow-lg border border-orange-100 p-5 overflow-hidden"
-      }
+      className="relative flex h-full flex-col justify-between bg-gradient-to-r from-white via-amber-50 to-orange-50 rounded-2xl shadow-lg border border-orange-100 p-5 overflow-hidden"
       whileHover={{ translateY: -6 }}
     >
-      {/* Decorative left accent bar */}
       <div className="absolute left-0 top-0 h-full w-2 rounded-l-2xl bg-gradient-to-b from-orange-400 to-amber-400" />
 
       <div className="flex items-start gap-4">
-        {/* Product Image (fixed size) */}
         <div className="flex-shrink-0 w-28 h-28 rounded-lg overflow-hidden bg-orange-50 border border-orange-100 flex items-center justify-center">
           {product.image ? (
             <img
@@ -45,7 +54,6 @@ const ProductCard = ({ product, onAddToCart }) => {
           )}
         </div>
 
-        {/* Main content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
@@ -55,14 +63,13 @@ const ProductCard = ({ product, onAddToCart }) => {
               <div className="mt-3 flex items-center gap-3">
                 <div className="inline-flex items-baseline gap-2">
                   <span className="text-orange-700 font-extrabold text-lg">LKR {formatPrice(displayPrice)}</span>
-                  {isDiscounted && (
-                    <span className="text-gray-400 line-through text-sm">LKR {formatPrice(product.price)}</span>
-                  )}
+                  {isDiscounted && <span className="text-gray-400 line-through text-sm">LKR {formatPrice(product.price)}</span>}
                 </div>
 
-                {/* small badges */}
                 <div className="flex items-center gap-2">
-                  <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full font-medium capitalize">{product.category || 'General'}</span>
+                  <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full font-medium capitalize">
+                    {product.category || 'General'}
+                  </span>
                   {product.tags && product.tags.length > 0 && (
                     <span className="text-xs bg-white/60 text-gray-700 px-2 py-1 rounded-full">{product.tags[0]}</span>
                   )}
@@ -73,7 +80,6 @@ const ProductCard = ({ product, onAddToCart }) => {
               </div>
             </div>
 
-            {/* Right column: quick info & Add */}
             <div className="flex flex-col items-end justify-between ml-2">
               <div className="flex items-center gap-2">
                 {product.stock !== undefined && (
@@ -116,12 +122,12 @@ const ProductCard = ({ product, onAddToCart }) => {
         </div>
       </div>
 
-      {/* subtle right label */}
       <div className="absolute right-3 top-3 rounded px-2 py-0.5 bg-white/40 text-xs text-gray-600 border border-white/30">SuperMart</div>
     </motion.div>
   );
 };
 
+/* --- FilterSection (unchanged) --- */
 const FilterSection = ({ title, options, selectedFilters, onFilterChange }) => {
   return (
     <div className="mb-8">
@@ -129,8 +135,8 @@ const FilterSection = ({ title, options, selectedFilters, onFilterChange }) => {
       <div className="space-y-3">
         {options.map((option) => (
           <div key={option.value} className="flex items-center gap-3">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               className="w-5 h-5 rounded border-gray-800/50"
               checked={selectedFilters.includes(option.value)}
               onChange={() => onFilterChange(option.value)}
@@ -143,6 +149,7 @@ const FilterSection = ({ title, options, selectedFilters, onFilterChange }) => {
   );
 };
 
+/* --- ProductPage main --- */
 const ProductPage = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -150,11 +157,9 @@ const ProductPage = () => {
   const [categoryFilter, setCategoryFilter] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [categoryOptions, setCategoryOptions] = useState([
-    { value: 'other', label: 'Other' }
-  ]);
+  const [categoryOptions, setCategoryOptions] = useState([{ value: 'other', label: 'Other' }]);
+  const [toast, setToast] = useState(null);
 
-  // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -163,14 +168,13 @@ const ProductPage = () => {
         setFilteredProducts(productsData.data);
         setLoading(false);
 
-        // Collect all unique, normalized categories from data
         const categoriesSet = new Set();
         productsData.data.forEach(product => {
           let cat = (product.category || '').trim();
           if (!cat) cat = 'Other';
           categoriesSet.add(cat);
         });
-        // Map known categories to friendly labels, otherwise use raw name
+
         const friendlyLabels = {
           fruits: 'Fruits & Vegetables',
           snacks: 'Snacks & Beverages',
@@ -179,6 +183,7 @@ const ProductPage = () => {
           bakery: 'Bakery Items',
           other: 'Other'
         };
+
         const options = Array.from(categoriesSet).map(cat => {
           const key = cat.toLowerCase();
           return {
@@ -196,10 +201,8 @@ const ProductPage = () => {
     fetchProducts();
   }, []);
 
-  // Apply filters when they change
   useEffect(() => {
     let result = [...products];
-    // Price filter
     if (priceFilter.length > 0) {
       result = result.filter(product => {
         if (priceFilter.includes('discounted') && product.discounted) return true;
@@ -207,7 +210,6 @@ const ProductPage = () => {
         return false;
       });
     }
-    // Category filter (case-insensitive, fallback to 'other' for unknown/empty categories)
     if (categoryFilter.length > 0) {
       result = result.filter(product => {
         let cat = (product.category || '').trim();
@@ -218,13 +220,23 @@ const ProductPage = () => {
     setFilteredProducts(result);
   }, [priceFilter, categoryFilter, products, categoryOptions]);
 
-  const handleAddToCart = async (product) => {
+  // Add to cart -> localStorage (shared)
+  const handleAddToCart = (product) => {
     try {
-      await addToCart(product._id, 1);
-      // You can add a toast notification here for success
-    } catch (err) {
-      console.error('Error adding to cart:', err);
-      // Handle error (show error message)
+      const cart = getCartFromStorage();
+      const idx = cart.findIndex(item => item.product._id === product._id);
+      if (idx !== -1) {
+        cart[idx].quantity += 1;
+      } else {
+        cart.push({ product, quantity: 1 });
+      }
+      saveCartToStorage(cart);
+      setToast(`${product.name} added to cart`);
+      setTimeout(() => setToast(null), 1800);
+    } catch (e) {
+      console.error(e);
+      setToast('Failed to add to cart');
+      setTimeout(() => setToast(null), 1800);
     }
   };
 
@@ -237,9 +249,7 @@ const ProductPage = () => {
     return (
       <div className="min-h-screen w-full relative bg-white overflow-hidden">
         <NavBarCart />
-        <div className="container mx-auto px-4 py-8 mt-60 text-center">
-          Loading products...
-        </div>
+        <div className="container mx-auto px-4 py-8 mt-60 text-center">Loading products...</div>
       </div>
     );
   }
@@ -248,9 +258,7 @@ const ProductPage = () => {
     return (
       <div className="min-h-screen w-full relative bg-white overflow-hidden">
         <NavBarCart />
-        <div className="container mx-auto px-4 py-8 mt-60 text-center">
-          Error: {error}
-        </div>
+        <div className="container mx-auto px-4 py-8 mt-60 text-center">Error: {error}</div>
       </div>
     );
   }
@@ -259,57 +267,42 @@ const ProductPage = () => {
     <div className="min-h-screen w-full relative bg-white overflow-hidden">
       <NavBarCart />
 
-      {/* Main Content */}
       <div className="container mx-auto px-4 py-8 mt-60 flex flex-col lg:flex-row gap-8">
-        {/* Filters Section */}
         <div className="w-full lg:w-72 bg-white p-6 rounded-xl shadow-md">
           <h3 className="text-black text-xl font-semibold mb-6">Filters</h3>
-          
-          <FilterSection 
+
+          <FilterSection
             title="Price"
             options={priceOptions}
             selectedFilters={priceFilter}
-            onFilterChange={(value) => 
-              setPriceFilter(prev => 
-                prev.includes(value) 
-                  ? prev.filter(v => v !== value) 
-                  : [...prev, value]
-              )
+            onFilterChange={(value) =>
+              setPriceFilter(prev => (prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]))
             }
           />
 
           <div className="w-full h-px bg-neutral-500/30 my-6"></div>
 
-          <FilterSection 
+          <FilterSection
             title="Category"
             options={categoryOptions}
             selectedFilters={categoryFilter}
-            onFilterChange={(value) => 
-              setCategoryFilter(prev => 
-                prev.includes(value) 
-                  ? prev.filter(v => v !== value) 
-                  : [...prev, value]
-              )
+            onFilterChange={(value) =>
+              setCategoryFilter(prev => (prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]))
             }
           />
         </div>
 
-        {/* Products Grid */}
-        {/* auto-rows-fr ensures every grid cell gets equal height; product cards use h-full */}
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8 auto-rows-fr">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <div key={product._id} className="h-full">
-                <ProductCard 
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                />
+                <ProductCard product={product} onAddToCart={handleAddToCart} />
               </div>
             ))
           ) : (
             <div className="col-span-2 text-center py-12">
               <p className="text-xl">No products match your filters</p>
-              <button 
+              <button
                 onClick={() => {
                   setPriceFilter([]);
                   setCategoryFilter([]);
@@ -322,6 +315,13 @@ const ProductPage = () => {
           )}
         </div>
       </div>
+
+      {/* Simple toast */}
+      {toast && (
+        <div className="fixed right-6 bottom-6 z-50 bg-orange-50 border-l-4 border-orange-400 text-orange-800 p-3 rounded shadow">
+          {toast}
+        </div>
+      )}
     </div>
   );
 };
