@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { createProduct, getProducts, updateProduct, deleteProduct } from '../api';
+import { createProduct, getProducts, updateProduct, deleteProduct, getSupplierProfit } from '../api';
 import { motion } from 'framer-motion'
 import { FiPlus, FiEdit2, FiTrash2, FiPackage, FiDollarSign, FiTag, FiInfo } from 'react-icons/fi'
 
@@ -28,20 +28,41 @@ const categories = [
 
 const units = ['kg', 'g', 'lb', 'oz', 'piece', 'pack', 'liter', 'ml']
 
+
 const Productes = () => {
   const [products, setProducts] = useState([])
   const [form, setForm] = useState(initialProduct)
   const [editIndex, setEditIndex] = useState(null)
   const [imageFile, setImageFile] = useState(null);
   const [imgPreview, setImgPreview] = useState('');
-  // Removed analytics tab, only product management remains
   const [showForm, setShowForm] = useState(false)
-  const [stats] = useState({
-    totalProducts: 48,
-    activeOrders: 12,
-    monthlyRevenue: 'LKR 245,800',
-    rating: 4.7
-  })
+  // Supplier analytics state
+  const [profitData, setProfitData] = useState([]);
+  const [totalProfit, setTotalProfit] = useState(0);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState('');
+  // Fetch supplier profit analytics
+  useEffect(() => {
+    let email = '';
+    try {
+      const raw = localStorage.getItem('userInfo');
+      if (raw) email = JSON.parse(raw).email || '';
+    } catch (e) {}
+    if (!email) return;
+    setAnalyticsLoading(true);
+    getSupplierProfit(email)
+      .then(res => {
+        setProfitData(res.data.profitPerProduct || []);
+        setTotalProfit(res.data.totalProfit || 0);
+        setAnalyticsError('');
+      })
+      .catch(() => {
+        setProfitData([]);
+        setTotalProfit(0);
+        setAnalyticsError('Failed to load analytics');
+      })
+      .finally(() => setAnalyticsLoading(false));
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -215,6 +236,51 @@ const Productes = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 pb-16">
+        {/* Supplier Analytics Section */}
+        <section className="mb-12">
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-green-200">
+            <h2 className="text-2xl font-bold text-green-800 mb-4 flex items-center"><FiDollarSign className="mr-2" /> Supplier Analytics</h2>
+            {analyticsLoading ? (
+              <div className="text-gray-500">Loading analytics...</div>
+            ) : analyticsError ? (
+              <div className="text-red-500">{analyticsError}</div>
+            ) : (
+              <>
+                <div className="mb-6 flex flex-col md:flex-row md:items-center md:space-x-8">
+                  <div className="text-lg font-semibold text-gray-700 mb-2 md:mb-0">Total Profit: <span className="text-green-700 font-bold">LKR {totalProfit.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span></div>
+                  <div className="text-sm text-gray-500">(Sum of profit from all products you have sold)</div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full bg-white border rounded-lg">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2 border-b text-left">Product</th>
+                        <th className="px-4 py-2 border-b text-left">Units Sold</th>
+                        <th className="px-4 py-2 border-b text-left">Profit per Unit</th>
+                        <th className="px-4 py-2 border-b text-left">Total Profit</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {profitData.length === 0 ? (
+                        <tr><td colSpan="4" className="text-center text-gray-400 py-4">No sales data yet.</td></tr>
+                      ) : profitData.map((item, idx) => (
+                        <tr key={item.productId || idx} className="hover:bg-green-50">
+                          <td className="px-4 py-2 border-b flex items-center">
+                            {item.image && <img src={item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`} alt={item.name} className="w-10 h-10 rounded mr-3 object-cover border" onError={e => { e.target.onerror = null; e.target.src = '/default-product.png'; }} />}
+                            <span>{item.name}</span>
+                          </td>
+                          <td className="px-4 py-2 border-b">{item.totalQuantity}</td>
+                          <td className="px-4 py-2 border-b">LKR {parseFloat(item.profitPerUnit).toFixed(2)}</td>
+                          <td className="px-4 py-2 border-b font-semibold text-green-700">LKR {parseFloat(item.totalProfit).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+          </div>
+        </section>
         {/* Product Form */}
         {showForm && (
               <motion.section

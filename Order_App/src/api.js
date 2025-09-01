@@ -1,3 +1,5 @@
+// Supplier analytics
+export const getSupplierProfit = (email) => api.get(`/orders/supplier-profit?email=${encodeURIComponent(email)}`);
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
