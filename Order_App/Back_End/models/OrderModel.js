@@ -16,11 +16,16 @@ const orderItemSchema = mongoose.Schema({
   }
 });
 
+
 const orderSchema = mongoose.Schema({
   items: [orderItemSchema],
   totalPrice: {
     type: Number,
     required: true
+  },
+  userEmail: {
+    type: String,
+    required: false
   }
 }, { timestamps: true });
 

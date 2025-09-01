@@ -145,7 +145,15 @@ const CartPage = () => {
     try {
       const payloadItems = cart.map(item => ({ product: item.product._id, quantity: item.quantity, price: item.product.price }));
       const totalPrice = payloadItems.reduce((sum, it) => sum + it.price * it.quantity, 0);
-      const res = await createOrder({ items: payloadItems, totalPrice });
+      // Get user email from localStorage
+      let userEmail = '';
+      const raw = localStorage.getItem('userInfo');
+      if (raw) {
+        try {
+          userEmail = JSON.parse(raw).email || '';
+        } catch (e) { userEmail = ''; }
+      }
+      const res = await createOrder({ items: payloadItems, totalPrice, userEmail });
       // If backend returns order data, use it; otherwise create a synthetic order id
       const orderId = res?.data?._id || (res?.data?.id) || `LOCAL-${Date.now().toString().slice(-6)}`;
 
@@ -353,7 +361,6 @@ const CartPage = () => {
                             <div className="font-bold text-gray-900">{fmt(order.totalPrice)}</div>
                             <div className="flex items-center gap-2">
                               <button onClick={() => setSelectedOrder(order)} className="text-sm px-3 py-1 rounded-lg bg-amber-500 text-white">View</button>
-                              <button onClick={() => { navigator.clipboard?.writeText(JSON.stringify(order)); setAlertMessage('Order copied to clipboard'); setShowAlert(true); setTimeout(() => setShowAlert(false), 1600); }} className="text-sm px-3 py-1 rounded-lg border">Copy</button>
                             </div>
                           </div>
                         </div>

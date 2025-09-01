@@ -4,7 +4,7 @@ const Order = require('../models/OrderModel');
 // @desc    Create new order
 // @route   POST /api/orders
 const addOrderItems = asyncHandler(async (req, res) => {
-  const { items, totalPrice } = req.body;
+  const { items, totalPrice, userEmail } = req.body;
 
   if (!items || items.length === 0) {
     res.status(400);
@@ -15,6 +15,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
   const order = new Order({
     items,
     totalPrice,
+    userEmail: userEmail || '',
   });
 
   const createdOrder = await order.save();
