@@ -114,13 +114,21 @@ const CartPage = () => {
       return;
     }
 
-    // Prepare receipt preview (local)
-    const items = cart.map(item => ({
+
+    // Prepare purchasedProducts array for backend and receipt
+    const purchasedProducts = cart.map(item => ({
+      productId: item.product._id,
       name: item.product.name,
-      price: item.product.price,
-      qty: item.quantity,
-      subtotal: item.product.price * item.quantity,
       image: item.product.image,
+      price: item.product.price,
+      quantity: item.quantity
+    }));
+    const items = purchasedProducts.map(it => ({
+      name: it.name,
+      price: it.price,
+      qty: it.quantity,
+      subtotal: it.price * it.quantity,
+      image: it.image,
     }));
     const subtotal = items.reduce((s, it) => s + it.subtotal, 0);
     const deliveryFee = cart.length > 0 ? 250 : 0;
@@ -143,8 +151,7 @@ const CartPage = () => {
 
     // Call backend createOrder (kept identical)
     try {
-      const payloadItems = cart.map(item => ({ product: item.product._id, quantity: item.quantity, price: item.product.price }));
-      const totalPrice = payloadItems.reduce((sum, it) => sum + it.price * it.quantity, 0);
+
       // Get user email from localStorage
       let userEmail = '';
       const raw = localStorage.getItem('userInfo');
@@ -153,7 +160,9 @@ const CartPage = () => {
           userEmail = JSON.parse(raw).email || '';
         } catch (e) { userEmail = ''; }
       }
-      const res = await createOrder({ items: payloadItems, totalPrice, userEmail });
+      const totalPrice = purchasedProducts.reduce((sum, it) => sum + it.price * it.quantity, 0);
+      // Send purchasedProducts array to backend
+      const res = await createOrder({ purchasedProducts, totalPrice, userEmail });
       // If backend returns order data, use it; otherwise create a synthetic order id
       const orderId = res?.data?._id || (res?.data?.id) || `LOCAL-${Date.now().toString().slice(-6)}`;
 
@@ -196,17 +205,19 @@ const CartPage = () => {
   };
 
   const renderOrderThumbnails = (order) => {
-    if (!order.items || order.items.length === 0) return null;
-    const thumbs = order.items.slice(0, 3).map((it, idx) => {
-      const p = it.product || {};
-      const src = p.image ? (p.image.startsWith('http') ? p.image : `http://localhost:5000${p.image}`) : null;
+    const products = order.purchasedProducts || order.items || [];
+    if (!products || products.length === 0) return null;
+    const thumbs = products.slice(0, 3).map((it, idx) => {
+      const name = it.name || '';
+      const image = it.image || '';
+      const src = image ? (image.startsWith('http') ? image : `http://localhost:5000${image}`) : null;
       return (
         <div key={idx} className="w-10 h-10 rounded-md overflow-hidden border border-gray-100">
-          {src ? <img src={src} alt={p.name} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gray-100" />}
+          {src ? <img src={src} alt={name} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gray-100" />}
         </div>
       );
     });
-    const extra = order.items.length > 3 ? order.items.length - 3 : 0;
+    const extra = products.length > 3 ? products.length - 3 : 0;
     return (
       <div className="flex items-center -space-x-2">
         {thumbs}
@@ -469,25 +480,27 @@ const CartPage = () => {
 
             <div className="mt-4 divide-y">
               <div className="py-4">
-                {(selectedOrder.items || []).map((it, i) => {
-                  const p = it.product || {};
+                {(selectedOrder.purchasedProducts || selectedOrder.items || []).map((it, i) => {
+                  const name = it.name || '';
+                  const image = it.image || '';
+                  const price = it.price || 0;
+                  const quantity = it.quantity || 0;
                   return (
                     <div key={i} className="flex items-center justify-between gap-4 py-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        {p.image && (
+                        {image && (
                           <div className="w-14 h-14 rounded-md overflow-hidden">
-                            <img src={p.image.startsWith('http') ? p.image : `http://localhost:5000${p.image}`} alt={p.name} className="w-full h-full object-cover" />
+                            <img src={image.startsWith('http') ? image : `http://localhost:5000${image}`} alt={name} className="w-full h-full object-cover" />
                           </div>
                         )}
                         <div className="min-w-0">
-                          <div className="font-medium truncate">{p.name}</div>
-                          <div className="text-sm text-gray-500">{p.category || 'General'}</div>
+                          <div className="font-medium truncate">{name}</div>
                         </div>
                       </div>
 
                       <div className="text-right">
-                        <div className="font-semibold">{fmt((p.price || it.price || 0) * (it.quantity || 1))}</div>
-                        <div className="text-sm text-gray-500">{it.quantity} × {fmt(p.price || it.price || 0)}</div>
+                        <div className="font-semibold">{fmt(price * quantity)}</div>
+                        <div className="text-sm text-gray-500">{quantity} × {fmt(price)}</div>
                       </div>
                     </div>
                   );
@@ -502,7 +515,6 @@ const CartPage = () => {
               </div>
 
               <div className="py-4 flex justify-end gap-3">
-                <button onClick={() => { navigator.clipboard?.writeText(JSON.stringify(selectedOrder)); setAlertMessage('Order copied'); setShowAlert(true); setTimeout(()=>setShowAlert(false),1500); }} className="px-4 py-2 border rounded-lg">Copy JSON</button>
                 <button onClick={() => setSelectedOrder(null)} className="px-4 py-2 bg-amber-500 text-white rounded-lg">Close</button>
               </div>
             </div>
