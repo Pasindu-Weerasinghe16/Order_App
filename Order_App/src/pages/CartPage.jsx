@@ -189,6 +189,11 @@ const CartPage = () => {
         } catch (e) { userEmailCheckout = ''; }
       }
       const orderRes = await getMyOrders(userEmailCheckout);
+          // refresh products from backend
+          try {
+            const prodRes = await getProducts();
+            setProducts(prodRes.data);
+          } catch (e) {}
       setOrders(orderRes.data || []);
     } catch (err) {
       console.error(err);

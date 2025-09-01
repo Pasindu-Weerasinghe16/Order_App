@@ -28,6 +28,15 @@ const addOrderItems = asyncHandler(async (req, res) => {
   });
 
   const createdOrder = await order.save();
+  // Reduce product stock for each item
+  const Product = require('../models/ProductModel');
+  for (const item of items) {
+    await Product.findByIdAndUpdate(
+      item.product,
+      { $inc: { stock: -item.quantity } },
+      { new: false }
+    );
+  }
   res.status(201).json(createdOrder);
 });
 
