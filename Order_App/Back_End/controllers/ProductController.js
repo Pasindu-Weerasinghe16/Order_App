@@ -59,10 +59,15 @@ const updateProduct = asyncHandler(async (req, res) => {
 
 // @desc    Delete a product
 // @route   DELETE /api/products/:id
+const mongoose = require('mongoose');
 const deleteProduct = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400);
+    throw new Error('Invalid product ID');
+  }
+  const product = await Product.findByIdAndDelete(id);
   if (product) {
-    await product.remove();
     res.json({ message: 'Product removed' });
   } else {
     res.status(404);
