@@ -8,7 +8,7 @@ import Footer from './Footer'
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen w-full relative bg-white overflow-hidden">
+  <div className="relative  w-full">
       <NavBar />
       <HeroSection />
       <OffersSection />

@@ -237,6 +237,17 @@ const CartPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left: Cart items (big column) */}
           <div className="lg:col-span-2 space-y-4">
+            {/* Add More Products Button (only if cart has items) */}
+            {cart.length > 0 && (
+              <div className="flex justify-end mb-2">
+                <Link
+                  to="/product"
+                  className="inline-block bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-2 rounded-lg shadow transition"
+                >
+                  Add More Products
+                </Link>
+              </div>
+            )}
             <div className="bg-white rounded-2xl shadow-lg border border-orange-50 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">Your Cart</h2>
