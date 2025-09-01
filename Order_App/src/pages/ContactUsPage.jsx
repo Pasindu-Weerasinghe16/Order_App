@@ -4,15 +4,15 @@ import ContactUsNavBar from '../components/ContactUsNavBar'
 
 const ContactUsPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="w-[1920px] min-h-screen relative bg-white overflow-hidden">
       {/* NavBar with fixed height container */}
       <div className="relative h-[200px]">
         <ContactUsNavBar />
       </div>
-      
+
       {/* Main content with proper top spacing */}
-      <div className="container mx-auto px-4 pt-4 pb-20">
-        <div className="max-w-4xl mx-auto">
+      <div className="px-16 pt-4 pb-20">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
