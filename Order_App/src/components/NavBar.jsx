@@ -55,7 +55,7 @@ const NavBar = () => {
       
       <div className="left-[547px] top-[135px] absolute justify-start flex items-center gap-7">
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Link to="/">
+          <Link to="/home">
             <button className="px-4 py-2 rounded-full bg-amber-500 text-white text-lg font-medium font-['Poppins'] shadow hover:bg-amber-600 transition-colors">Home</button>
           </Link>
         </motion.div>

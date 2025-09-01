@@ -132,7 +132,7 @@ const NavBarCart = () => {
       {/* Navigation Links */}
       <div className="left-[547px] top-[135px] absolute justify-start flex items-center gap-7">
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Link to="/">
+          <Link to="/home">
             <button className={`px-4 py-2 rounded-full text-lg font-medium font-['Poppins'] shadow transition-colors ${
               location.pathname === '/' ? 'bg-amber-500 text-white' : 'bg-neutral-200 text-black hover:bg-amber-100'
             }`}>Home</button>

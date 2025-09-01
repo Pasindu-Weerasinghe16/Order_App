@@ -20,7 +20,8 @@ function App() {
   return (
     <div className="font-['Poppins']">
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<SignInPage />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/product" element={<Cart />} />
         <Route path="/contact-us" element={<ContactUsPage />} />
         <Route path="/signup" element={<SignUpPage />} />

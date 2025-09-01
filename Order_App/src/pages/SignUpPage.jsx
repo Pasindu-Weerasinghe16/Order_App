@@ -40,7 +40,7 @@ const SignUpPage = () => {
       }
 
       localStorage.setItem('userInfo', JSON.stringify(data));
-      navigate('/');
+  navigate('/home');
     } catch (err) {
       setError(err.message || 'Something went wrong');
     } finally {

@@ -31,7 +31,7 @@ const SignInPage = () => {
       if (data.isSupplier) {
         navigate('/supplier');
       } else {
-        navigate('/');
+  navigate('/home');
       }
     } else {
       throw new Error(data.message || 'Login failed');
