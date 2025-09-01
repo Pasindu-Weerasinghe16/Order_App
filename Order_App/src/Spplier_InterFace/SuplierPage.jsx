@@ -47,7 +47,13 @@ const Productes = () => {
     const fetchProducts = async () => {
       try {
         const res = await getProducts();
-        setProducts(res.data);
+        let email = '';
+        try {
+          const raw = localStorage.getItem('userInfo');
+          if (raw) email = JSON.parse(raw).email || '';
+        } catch (e) {}
+        const filtered = res.data.filter(prod => prod.userEmail === email);
+        setProducts(filtered);
       } catch (err) {
         setProducts([]);
       }
