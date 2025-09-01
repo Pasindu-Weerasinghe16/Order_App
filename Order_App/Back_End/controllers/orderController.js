@@ -34,8 +34,11 @@ const addOrderItems = asyncHandler(async (req, res) => {
 // @desc    Get all orders (since no user)
 // @route   GET /api/orders/myorders
 const getMyOrders = asyncHandler(async (req, res) => {
+  // Get userEmail from query param or req.user (if using auth)
+  const userEmail = req.query.userEmail || (req.user && req.user.email);
+  const filter = userEmail ? { userEmail } : {};
   // Populate product details for each order item
-  const orders = await Order.find().populate('items.product');
+  const orders = await Order.find(filter).populate('items.product');
   // Add a simplified purchasedProducts array to each order
   const ordersWithProducts = orders.map(order => {
     const purchasedProducts = (order.items || []).map(it => {

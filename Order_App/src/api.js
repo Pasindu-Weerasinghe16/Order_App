@@ -46,7 +46,12 @@ export const clearCart = () => api.delete('/cart');
 // Orders API
 export const createOrder = (orderData) => api.post('/orders', orderData);
 export const getOrderById = (id) => api.get(`/orders/${id}`);
-export const getMyOrders = () => api.get('/orders/myorders');
+export const getMyOrders = (userEmail) => {
+  if (userEmail) {
+    return api.get(`/orders/myorders?userEmail=${encodeURIComponent(userEmail)}`);
+  }
+  return api.get('/orders/myorders');
+};
 export const updateOrderToPaid = (id, paymentResult) => api.put(`/orders/${id}/pay`, paymentResult);
 
 export default api;

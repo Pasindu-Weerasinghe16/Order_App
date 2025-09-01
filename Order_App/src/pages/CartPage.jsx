@@ -43,7 +43,15 @@ const CartPage = () => {
       try {
         const prodRes = await getProducts();
         setProducts(prodRes.data);
-        const orderRes = await getMyOrders();
+        // Get user email from localStorage
+        let userEmailFetch = '';
+        const rawFetch = localStorage.getItem('userInfo');
+        if (rawFetch) {
+          try {
+            userEmailFetch = JSON.parse(rawFetch).email || '';
+          } catch (e) { userEmailFetch = ''; }
+        }
+        const orderRes = await getMyOrders(userEmailFetch);
         setOrders(orderRes.data);
       } catch (err) {
         setProducts([]);
@@ -173,7 +181,14 @@ const CartPage = () => {
       // clear cart
       updateCart([]);
       // refresh orders from backend (kept)
-      const orderRes = await getMyOrders();
+      let userEmailCheckout = '';
+      const rawCheckout = localStorage.getItem('userInfo');
+      if (rawCheckout) {
+        try {
+          userEmailCheckout = JSON.parse(rawCheckout).email || '';
+        } catch (e) { userEmailCheckout = ''; }
+      }
+      const orderRes = await getMyOrders(userEmailCheckout);
       setOrders(orderRes.data || []);
     } catch (err) {
       console.error(err);
