@@ -101,7 +101,7 @@ const Productes = () => {
         setProducts(updated);
         alert('Product updated successfully!');
       } else {
-        // Insert with image
+        // Insert with image and user email
         const formData = new FormData();
         formData.append('name', form.name);
         formData.append('description', form.description);
@@ -112,6 +112,14 @@ const Productes = () => {
         formData.append('discounted', !!form.discounted);
         if (form.discounted) formData.append('discountPrice', parseFloat(form.discountPrice));
         if (imageFile) formData.append('image', imageFile);
+        // Add user email from localStorage
+        try {
+          const raw = localStorage.getItem('userInfo');
+          if (raw) {
+            const email = JSON.parse(raw).email;
+            if (email) formData.append('userEmail', email);
+          }
+        } catch (e) {}
         res = await createProduct(formData);
         setProducts([...products, res.data]);
         alert('Product added successfully!');

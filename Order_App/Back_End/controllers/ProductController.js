@@ -19,6 +19,7 @@ const createProduct = asyncHandler(async (req, res) => {
     // The image will be served at /uploads/filename
     imageUrl = `/uploads/${req.file.filename}`;
   }
+  const userEmail = req.body.userEmail || (req.user && req.user.email ? req.user.email : '');
   const product = new Product({
     name,
     description,
@@ -28,7 +29,8 @@ const createProduct = asyncHandler(async (req, res) => {
     unit,
     image: imageUrl,
     discounted: isDiscounted,
-    discountPrice: isDiscounted ? discountPrice : undefined
+    discountPrice: isDiscounted ? discountPrice : undefined,
+    userEmail
   });
   const createdProduct = await product.save();
   res.status(201).json(createdProduct);
