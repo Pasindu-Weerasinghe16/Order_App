@@ -201,7 +201,7 @@ const NavBarCart = () => {
           <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto pointer-events-none transition-opacity z-50">
             <button
               className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-amber-100 rounded-lg"
-              onClick={() => { localStorage.removeItem('userInfo'); window.location.href = '/login'; }}
+              onClick={() => { localStorage.removeItem('userInfo'); window.location.href = '/'; }}
             >
               Log out
             </button>

@@ -254,6 +254,18 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen w-full relative bg-white overflow-hidden">
+      {/* Shopping Cart Navbar Heading */}
+      <nav className="fixed top-0 left-0 w-full z-40 bg-gradient-to-r from-amber-500 to-orange-400 shadow-lg py-4 px-0">
+        <div className="container mx-auto flex items-center justify-between px-4">
+          <div className="flex items-center gap-3">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A2 2 0 0 0 7.48 19h9.04a2 2 0 0 0 1.83-1.3L21 13M7 13V6a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v7" /></svg>
+            <span className="text-2xl md:text-3xl font-extrabold text-white tracking-tight drop-shadow">Shopping Cart</span>
+          </div>
+          <Link to="/product" className="hidden md:inline-block bg-white text-amber-600 font-semibold px-5 py-2 rounded-lg shadow hover:bg-amber-50 transition">Browse Products</Link>
+        </div>
+      </nav>
+  {/* Add more gap below navbar */}
+  <div className="h-12 md:h-20" />
       {showAlert && (
         <motion.div
           className="fixed top-4 right-4 z-50 bg-orange-50 border-l-4 border-orange-400 text-orange-800 p-4 rounded-lg shadow-lg max-w-md"
@@ -267,11 +279,7 @@ const CartPage = () => {
         </motion.div>
       )}
 
-      <div className="container mx-auto px-4 py-8 mt-28">
-        <motion.h1 className="text-4xl font-bold text-orange-900 mb-2" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-          Shopping Cart
-        </motion.h1>
-        <p className="text-gray-600 mb-8">Products are added from the Products page. This cart shows images and a receipt modal when you checkout.</p>
+  <div className="container mx-auto px-4 py-8">
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left: Cart items (big column) */}
@@ -423,7 +431,6 @@ const CartPage = () => {
               </div>
             </div>
 
-            <div className="mt-6 text-center text-xs text-gray-500">When you checkout you'll see an order receipt preview and status.</div>
           </div>
         </div>
       </div>
