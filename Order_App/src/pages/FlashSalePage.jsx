@@ -156,7 +156,7 @@ const FlashSalePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen w-full relative bg-white overflow-hidden">
       {/* NavBar (keeps same absolute positions) */}
       <div className="relative h-[200px]">
         <FlashSaleNavBar />

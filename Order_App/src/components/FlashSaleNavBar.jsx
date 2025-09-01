@@ -159,41 +159,32 @@ const FlashSaleNavBar = () => {
         </motion.div>
       </div>
 
-      {/* Login / Signup (positions preserved) */}
-      <div className="flex items-center gap-3 absolute left-[1422px] top-[118px]">
-        <motion.button
-          className="px-6 py-2 rounded-full bg-slate-950 text-white text-lg font-medium font-['Poppins'] hover:bg-amber-500 transition-colors duration-200 flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/login')}
+      {/* Notification, User Icon, and Email Address (all together) */}
+      <div className="absolute left-[1340px] top-[118px] flex items-center gap-3">
+        <motion.div 
+          className="relative"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
         >
-          <FaUser className="w-5 h-5" /> Login
-        </motion.button>
-
-        <motion.button
-          className="px-6 py-2 rounded-full bg-amber-500 text-white text-lg font-medium font-['Poppins'] hover:bg-slate-950 transition-colors duration-200 flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/signup')}
-        >
-          Signup
-        </motion.button>
-      </div>
-
-      {/* Notification & profile (kept) */}
-      <div className="w-28 h-12 left-[1684px] top-[129px] absolute inline-flex justify-start items-center gap-7">
-        <motion.div className="relative" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
           <FaBell className="w-6 h-6 text-gray-800" />
-          <motion.div
+          <motion.div 
             className="w-2 h-2 absolute -top-0 -right-0 bg-red-600 rounded-full"
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ repeat: Infinity, duration: 1.5 }}
           />
         </motion.div>
-
-        <motion.div className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold" whileHover={{ scale: 1.1 }}>
+        <motion.div 
+          className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold"
+          whileHover={{ scale: 1.1 }}
+        >
           User
         </motion.div>
+        <span className="text-lg font-medium font-['Poppins'] text-slate-950 bg-white px-6 py-2 rounded-full border border-gray-300 shadow">
+          {(() => {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            return userInfo?.email || 'Not logged in';
+          })()}
+        </span>
       </div>
     </>
   );

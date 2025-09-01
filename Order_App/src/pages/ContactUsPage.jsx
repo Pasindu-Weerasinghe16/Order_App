@@ -4,7 +4,7 @@ import ContactUsNavBar from '../components/ContactUsNavBar'
 
 const ContactUsPage = () => {
   return (
-    <div className="w-[1920px] min-h-screen relative bg-white overflow-hidden">
+    <div className="min-h-screen w-full relative bg-white overflow-hidden">
       {/* NavBar with fixed height container */}
       <div className="relative h-[200px]">
         <ContactUsNavBar />

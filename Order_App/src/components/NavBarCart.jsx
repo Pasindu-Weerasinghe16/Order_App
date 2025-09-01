@@ -171,26 +171,8 @@ const NavBarCart = () => {
         </motion.div>
       </div>
 
-      {/* Login and Signup Buttons */}
-      <div className="flex items-center gap-3 absolute left-[1422px] top-[118px]">
-        <motion.button
-          className="px-6 py-2 rounded-full bg-slate-950 text-white text-lg font-medium font-['Poppins'] hover:bg-amber-500 transition-colors duration-200 flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <FaUser className="w-5 h-5" /> Login
-        </motion.button>
-        <motion.button
-          className="px-6 py-2 rounded-full bg-amber-500 text-white text-lg font-medium font-['Poppins'] hover:bg-slate-950 transition-colors duration-200 flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Signup
-        </motion.button>
-      </div>
-
-      {/* Notification and Profile */}
-      <div className="w-28 h-12 left-[1684px] top-[129px] absolute inline-flex justify-start items-center gap-7">
+      {/* Notification, User Icon, and Email Address (all together) */}
+      <div className="absolute left-[1340px] top-[118px] flex items-center gap-3">
         <motion.div 
           className="relative"
           whileHover={{ scale: 1.1 }}
@@ -203,13 +185,18 @@ const NavBarCart = () => {
             transition={{ repeat: Infinity, duration: 1.5 }}
           />
         </motion.div>
-
         <motion.div 
           className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold"
           whileHover={{ scale: 1.1 }}
         >
           User
         </motion.div>
+        <span className="text-lg font-medium font-['Poppins'] text-slate-950 bg-white px-6 py-2 rounded-full border border-gray-300 shadow">
+          {(() => {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            return userInfo?.email || 'Not logged in';
+          })()}
+        </span>
       </div>
     </>
   )
