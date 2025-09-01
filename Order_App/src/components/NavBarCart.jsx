@@ -185,12 +185,28 @@ const NavBarCart = () => {
             transition={{ repeat: Infinity, duration: 1.5 }}
           />
         </motion.div>
-        <motion.div 
-          className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold"
-          whileHover={{ scale: 1.1 }}
-        >
-          User
-        </motion.div>
+        <div className="relative group">
+          <motion.div
+            className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-white font-bold cursor-pointer border-2 border-white shadow-lg"
+            whileHover={{ scale: 1.1 }}
+          >
+            {/* Creative User SVG */}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" className="w-8 h-8">
+              <circle cx="16" cy="12" r="6" fill="#fff" fillOpacity=".7"/>
+              <ellipse cx="16" cy="23" rx="9" ry="6" fill="#fff" fillOpacity=".4"/>
+              <circle cx="16" cy="12" r="5" fill="#f59e42"/>
+            </svg>
+          </motion.div>
+          {/* Dropdown */}
+          <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto pointer-events-none transition-opacity z-50">
+            <button
+              className="block w-full text-left px-4 py-3 text-gray-800 hover:bg-amber-100 rounded-lg"
+              onClick={() => { localStorage.removeItem('userInfo'); window.location.href = '/login'; }}
+            >
+              Log out
+            </button>
+          </div>
+        </div>
         <span className="text-lg font-medium font-['Poppins'] text-slate-950 bg-white px-6 py-2 rounded-full border border-gray-300 shadow">
           {(() => {
             const userInfo = JSON.parse(localStorage.getItem('userInfo'));
