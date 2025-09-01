@@ -178,7 +178,22 @@ const Productes = () => {
             </button>
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 rounded-full bg-white text-green-800 flex items-center justify-center font-bold">
-                SP
+                {(() => {
+                  try {
+                    const raw = localStorage.getItem('userInfo');
+                    if (raw) return (JSON.parse(raw).email || 'U').charAt(0).toUpperCase();
+                  } catch (e) {}
+                  return 'U';
+                })()}
+              </div>
+              <div className="text-xs text-green-100">
+                {(() => {
+                  try {
+                    const raw = localStorage.getItem('userInfo');
+                    if (raw) return JSON.parse(raw).email || 'Guest';
+                  } catch (e) {}
+                  return 'Guest';
+                })()}
               </div>
             </div>
           </div>

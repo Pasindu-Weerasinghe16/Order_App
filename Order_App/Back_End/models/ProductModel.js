@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 const productSchema = new mongoose.Schema(
   {
   // user field removed for public CRUD
+    userEmail: {
+      type: String,
+      required: false
+    },
     name: {
       type: String,
       required: true
