@@ -52,8 +52,9 @@ const Productes = () => {
     setAnalyticsLoading(true);
     getSupplierProfit(email)
       .then(res => {
-        setProfitData(res.data.profitPerProduct || []);
-        setTotalProfit(res.data.totalProfit || 0);
+  // Backend returns products array, not profitPerProduct
+  setProfitData(res.data.products || []);
+  setTotalProfit(res.data.totalProfit || 0);
         setAnalyticsError('');
       })
       .catch(() => {
@@ -236,10 +237,188 @@ const Productes = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 pb-16">
+        {/* Product Form */}
+        {showForm && (
+          <motion.section
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 10 }}
+            className="bg-white rounded-2xl shadow-xl overflow-hidden mb-12 border border-green-200"
+          >
+            <div className="bg-green-700 px-8 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-white">
+                {editIndex !== null ? 'Edit Product' : 'Add New Product'}
+              </h2>
+              <button
+                type="button"
+                onClick={() => { setShowForm(false); setForm(initialProduct); setEditIndex(null); }}
+                className="text-white bg-green-900 hover:bg-green-800 px-3 py-1 rounded-lg font-medium"
+              >
+                Close
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="e.g. Organic Apples"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <textarea
+                    name="description"
+                    value={form.description}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Product details, features, etc."
+                    rows={3}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                    <select
+                      name="category"
+                      value={form.category}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      required
+                    >
+                      <option value="">Select category</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+                    <select
+                      name="unit"
+                      value={form.unit}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    >
+                      {units.map((unit) => (
+                        <option key={unit} value={unit}>{unit}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Price (LKR) *</label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={form.price}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity</label>
+                    <input
+                      type="number"
+                      name="stock"
+                      value={form.stock}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="Available quantity"
+                      min="0"
+                    />
+                  </div>
+                </div>
+                {/* Discount Section */}
+                <div className="grid grid-cols-2 gap-6 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Discounted?</label>
+                    <select
+                      name="discounted"
+                      value={form.discounted ? 'true' : 'false'}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    >
+                      <option value="false">No</option>
+                      <option value="true">Yes</option>
+                    </select>
+                  </div>
+                  {form.discounted && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Discount Price</label>
+                      <input
+                        type="number"
+                        name="discountPrice"
+                        value={form.discountPrice}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                        placeholder="Discounted price"
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col">
+                {/* Image upload input */}
+                <label className="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={e => {
+                    const file = e.target.files[0];
+                    setImageFile(file);
+                    if (file) setImgPreview(URL.createObjectURL(file));
+                    else setImgPreview('');
+                  }}
+                  className="mb-4"
+                />
+                {imgPreview && (
+                  <img src={imgPreview} alt="Preview" className="mb-4 rounded-lg border w-32 h-32 object-cover" />
+                )}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  className="mt-auto w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-lg font-bold text-lg transition-all flex items-center justify-center space-x-2"
+                >
+                  <FiPlus />
+                  <span>{editIndex !== null ? 'Update Product' : 'Add Product'}</span>
+                </motion.button>
+                {editIndex !== null && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm(initialProduct)
+                      setImgPreview('')
+                      setImageFile(null)
+                      setEditIndex(null)
+                    }}
+                    className="mt-3 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-lg font-medium text-lg transition-colors"
+                  >
+                    Cancel Edit
+                  </button>
+                )}
+              </div>
+            </form>
+          </motion.section>
+        )}
         {/* Supplier Analytics Section */}
         <section className="mb-12">
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-green-200">
-            <h2 className="text-2xl font-bold text-green-800 mb-4 flex items-center"><FiDollarSign className="mr-2" /> Supplier Analytics</h2>
+            <h2 className="text-2xl font-bold text-green-800 mb-4 flex items-center"> Supplier Analytics</h2>
             {analyticsLoading ? (
               <div className="text-gray-500">Loading analytics...</div>
             ) : analyticsError ? (
@@ -248,223 +427,60 @@ const Productes = () => {
               <>
                 <div className="mb-6 flex flex-col md:flex-row md:items-center md:space-x-8">
                   <div className="text-lg font-semibold text-gray-700 mb-2 md:mb-0">Total Profit: <span className="text-green-700 font-bold">LKR {totalProfit.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span></div>
-                  <div className="text-sm text-gray-500">(Sum of profit from all products you have sold)</div>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white border rounded-lg">
+                  <table className="min-w-full bg-white rounded-xl shadow border-separate border-spacing-0">
                     <thead>
-                      <tr>
-                        <th className="px-4 py-2 border-b text-left">Product</th>
-                        <th className="px-4 py-2 border-b text-left">Units Sold</th>
-                        <th className="px-4 py-2 border-b text-left">Profit per Unit</th>
-                        <th className="px-4 py-2 border-b text-left">Total Profit</th>
+                      <tr className="bg-gradient-to-r from-green-600 to-green-400 text-white">
+                        <th className="px-6 py-4 rounded-tl-xl text-left font-semibold w-2/5">Product</th>
+                        <th className="px-6 py-4 text-left font-semibold w-1/5">Units Sold</th>
+                        <th className="px-6 py-4 text-left font-semibold w-1/5">Profit per Unit</th>
+                        <th className="px-6 py-4 rounded-tr-xl text-left font-semibold w-1/5">Total Profit</th>
                       </tr>
                     </thead>
                     <tbody>
                       {profitData.length === 0 ? (
-                        <tr><td colSpan="4" className="text-center text-gray-400 py-4">No sales data yet.</td></tr>
-                      ) : profitData.map((item, idx) => (
-                        <tr key={item.productId || idx} className="hover:bg-green-50">
-                          <td className="px-4 py-2 border-b flex items-center">
-                            {item.image && <img src={item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`} alt={item.name} className="w-10 h-10 rounded mr-3 object-cover border" onError={e => { e.target.onerror = null; e.target.src = '/default-product.png'; }} />}
-                            <span>{item.name}</span>
-                          </td>
-                          <td className="px-4 py-2 border-b">{item.totalQuantity}</td>
-                          <td className="px-4 py-2 border-b">LKR {parseFloat(item.profitPerUnit).toFixed(2)}</td>
-                          <td className="px-4 py-2 border-b font-semibold text-green-700">LKR {parseFloat(item.totalProfit).toFixed(2)}</td>
+                        <tr>
+                          <td colSpan="4" className="text-center text-gray-400 py-8 bg-gray-50 rounded-b-xl">No sales data yet.</td>
                         </tr>
-                      ))}
+                      ) : profitData.map((item, idx) => {
+                        const totalSold = item.totalSold || 0;
+                        const totalProfit = item.totalProfit || 0;
+                        const profitPerUnit = totalSold > 0 ? (totalProfit / totalSold) : 0;
+                        return (
+                          <tr key={item.productId || idx} className={
+                            `transition-all duration-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-green-50'} hover:bg-green-100`
+                          }>
+                            <td className="px-6 py-4 flex items-center gap-3 border-b border-gray-100">
+                              {item.image && (
+                                <img
+                                  src={item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`}
+                                  alt={item.name}
+                                  className="w-12 h-12 rounded-lg object-cover border shadow-sm"
+                                  onError={e => { e.target.onerror = null; e.target.src = '/default-product.png'; }}
+                                />
+                              )}
+                              <span className="font-medium text-gray-800">{item.name}</span>
+                            </td>
+                            <td className="px-6 py-4 border-b border-gray-100 text-green-900 font-semibold text-lg">{totalSold}</td>
+                            <td className="px-6 py-4 border-b border-gray-100 text-green-700 font-semibold">LKR {profitPerUnit.toFixed(2)}</td>
+                            <td className="px-6 py-4 border-b border-gray-100 text-green-800 font-bold">LKR {totalProfit.toFixed(2)}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
+                    <tfoot>
+                      <tr className="bg-green-100">
+                        <td colSpan="3" className="px-6 py-4 text-right font-bold text-green-900 text-lg rounded-bl-xl">Total Profit</td>
+                        <td className="px-6 py-4 font-extrabold text-green-800 text-lg rounded-br-xl">LKR {totalProfit.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                      </tr>
+                    </tfoot>
                   </table>
                 </div>
               </>
             )}
           </div>
         </section>
-        {/* Product Form */}
-        {showForm && (
-              <motion.section
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 10 }}
-                className="bg-white rounded-2xl shadow-xl overflow-hidden mb-12 border border-green-200"
-              >
-                <div className="bg-green-700 px-8 py-4 flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-white">
-                    {editIndex !== null ? 'Edit Product' : 'Add New Product'}
-                  </h2>
-                  <button
-                    type="button"
-                    onClick={() => { setShowForm(false); setForm(initialProduct); setEditIndex(null); }}
-                    className="text-white bg-green-900 hover:bg-green-800 px-3 py-1 rounded-lg font-medium"
-                  >
-                    Close
-                  </button>
-                </div>
-                
-                <form onSubmit={handleSubmit} className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="e.g. Organic Apples"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                      <textarea
-                        name="description"
-                        value={form.description}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        placeholder="Product details, features, etc."
-                        rows={3}
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                        <select
-                          name="category"
-                          value={form.category}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          required
-                        >
-                          <option value="">Select category</option>
-                          {categories.map((cat) => (
-                            <option key={cat} value={cat}>{cat}</option>
-                          ))}
-                        </select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
-                        <select
-                          name="unit"
-                          value={form.unit}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        >
-                          {units.map((unit) => (
-                            <option key={unit} value={unit}>{unit}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Price (LKR) *</label>
-                        <input
-                          type="number"
-                          name="price"
-                          value={form.price}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          placeholder="0.00"
-                          min="0"
-                          step="0.01"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Stock Quantity</label>
-                        <input
-                          type="number"
-                          name="stock"
-                          value={form.stock}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          placeholder="Available quantity"
-                          min="0"
-                        />
-                      </div>
-                    </div>
-                    {/* Discount Section */}
-                    <div className="grid grid-cols-2 gap-6 mt-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Discounted?</label>
-                        <select
-                          name="discounted"
-                          value={form.discounted ? 'true' : 'false'}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        >
-                          <option value="false">No</option>
-                          <option value="true">Yes</option>
-                        </select>
-                      </div>
-                      {form.discounted && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Discount Price</label>
-                          <input
-                            type="number"
-                            name="discountPrice"
-                            value={form.discountPrice}
-                            onChange={handleChange}
-                            className="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                            placeholder="Discounted price"
-                            min="0"
-                            step="0.01"
-                            required
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    {/* Image upload input */}
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={e => {
-                        const file = e.target.files[0];
-                        setImageFile(file);
-                        if (file) setImgPreview(URL.createObjectURL(file));
-                        else setImgPreview('');
-                      }}
-                      className="mb-4"
-                    />
-                    {imgPreview && (
-                      <img src={imgPreview} alt="Preview" className="mb-4 rounded-lg border w-32 h-32 object-cover" />
-                    )}
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      type="submit"
-                      className="mt-auto w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 px-6 rounded-lg font-bold text-lg transition-all flex items-center justify-center space-x-2"
-                    >
-                      <FiPlus />
-                      <span>{editIndex !== null ? 'Update Product' : 'Add Product'}</span>
-                    </motion.button>
-                    {editIndex !== null && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setForm(initialProduct)
-                          setImgPreview('')
-                          setImageFile(null)
-                          setEditIndex(null)
-                        }}
-                        className="mt-3 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-6 rounded-lg font-medium text-lg transition-colors"
-                      >
-                        Cancel Edit
-                      </button>
-                    )}
-                  </div>
-                </form>
-              </motion.section>
-            )}
 
             {/* Product List */}
             <section>
