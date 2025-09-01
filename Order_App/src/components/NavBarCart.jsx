@@ -94,22 +94,32 @@ const NavBarCart = () => {
           Cart Section (functional)
           ------------------------- */}
 
-      {/* Cart Section (icon, items, price) */}
+
+      {/* Cart Section (aligned like FlashSaleNavBar, but keep green color) */}
       <div
         role="button"
         onClick={goToCart}
-        className="w-[400px] h-16 left-[1357px] top-[26px] absolute bg-green-700 rounded-bl-xl rounded-br-xl border border-black/10 cursor-pointer flex items-center justify-between px-18 shadow-lg hover:bg-green-800 transition-colors"
+        className="w-96 h-16 left-[1357px] top-[26px] absolute bg-green-700 rounded-bl-xl rounded-br-xl border border-black/10 cursor-pointer"
         title="Go to cart"
+      />
+
+      {/* Cart Icon (clickable, absolute position) */}
+      <button
+        onClick={goToCart}
+        aria-label="Open cart"
+        className="absolute left-[1381px] top-[31px] bg-transparent p-0 border-0"
+        style={{ width: 32, height: 32 }}
       >
-        <div className="flex items-center gap-4">
-          <FaShoppingCart className="w-8 h-8 text-white" />
-          <span className="text-white text-lg font-semibold font-['Poppins']">
-            {itemCount} {itemCount === 1 ? 'Item' : 'Items'}
-          </span>
-        </div>
-        <span className="text-white text-lg font-bold font-['Poppins'] tracking-wide ml-4">
-          {fmt(totalPrice)}
-        </span>
+        <FaShoppingCart className="w-8 h-8 left-[1381px] top-[41px] absolute text-white" />
+      </button>
+
+      {/* Item count & total (aligned like FlashSaleNavBar) */}
+      <div onClick={goToCart} className="left-[1455px] top-[49px] absolute justify-start text-white text-base font-semibold font-['Poppins'] cursor-pointer">
+        {itemCount} {itemCount === 1 ? 'Item' : 'Items'}
+      </div>
+
+      <div onClick={goToCart} className="left-[1564px] top-[49px] absolute justify-start text-white text-base font-semibold font-['Poppins'] cursor-pointer">
+        {fmt(totalPrice)}
       </div>
 
       {/* Vertical dividers (kept as in your original layout) */}
