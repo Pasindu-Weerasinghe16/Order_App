@@ -1,9 +1,59 @@
+
 import { Link, useNavigate } from 'react-router-dom'
 import { FaMapMarkerAlt, FaShoppingCart, FaChevronDown, FaUser, FaBell, FaSearch } from 'react-icons/fa'
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+
+const CART_KEY = 'supermart_cart_v1'
+const readCartFromStorage = () => {
+  try {
+    const raw = localStorage.getItem(CART_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch (e) {
+    console.error('Failed to parse cart from storage', e)
+    return []
+  }
+}
 
 const NavBar = () => {
   const navigate = useNavigate();
+
+  // cart derived values
+  const [cart, setCart] = useState(() => readCartFromStorage())
+  const [itemCount, setItemCount] = useState(0)
+  const [totalPrice, setTotalPrice] = useState(0)
+
+  useEffect(() => {
+    const calc = (c) => {
+      const count = (c || []).reduce((s, it) => s + (it.quantity || 0), 0)
+      const total = (c || []).reduce((s, it) => s + ((it.product?.price || 0) * (it.quantity || 0)), 0)
+      setItemCount(count)
+      setTotalPrice(total)
+    }
+    calc(cart)
+    const onCartUpdated = (e) => {
+      const newCart = e?.detail ?? readCartFromStorage()
+      setCart(newCart)
+      calc(newCart)
+    }
+    window.addEventListener('cart_updated', onCartUpdated)
+    const onStorage = (ev) => {
+      if (ev.key === CART_KEY) {
+        const newCart = readCartFromStorage()
+        setCart(newCart)
+        calc(newCart)
+      }
+    }
+    window.addEventListener('storage', onStorage)
+    return () => {
+      window.removeEventListener('cart_updated', onCartUpdated)
+      window.removeEventListener('storage', onStorage)
+    }
+  }, [])
+
+  const fmt = (n) => `LKR ${Number(n || 0).toFixed(2)}`
+  const goToCart = () => navigate('/cart-page')
+
   return (
     <>
       {/* Top Navigation Bar */}
@@ -29,17 +79,38 @@ const NavBar = () => {
       
       <FaMapMarkerAlt className="w-6 h-6 left-[823px] top-[48px] absolute text-gray-700" />
       
-      {/* Cart Section */}
-      <div className="w-96 h-16 left-[1357px] top-[26px] absolute bg-green-700 rounded-bl-xl rounded-br-xl border border-black/10" />
-      <FaShoppingCart className="w-6 h-6 left-[1381px] top-[41px] absolute text-white" />
-      
+
+      {/* Cart Section (aligned like FlashSaleNavBar/NavBarCart, dynamic values) */}
+      <div
+        role="button"
+        onClick={goToCart}
+        className="w-96 h-16 left-[1357px] top-[26px] absolute bg-green-700 rounded-bl-xl rounded-br-xl border border-black/10 cursor-pointer"
+        title="Go to cart"
+      />
+
+      {/* Cart Icon (clickable, absolute position) */}
+      <button
+        onClick={goToCart}
+        aria-label="Open cart"
+        className="absolute left-[1381px] top-[31px] bg-transparent p-0 border-0"
+        style={{ width: 32, height: 32 }}
+      >
+        <FaShoppingCart className="w-8 h-8 left-[1381px] top-[41px] absolute text-white" />
+      </button>
+
+      {/* Item count & total (aligned, dynamic) */}
+      <div onClick={goToCart} className="left-[1455px] top-[49px] absolute justify-start text-white text-base font-semibold font-['Poppins'] cursor-pointer">
+        {itemCount} {itemCount === 1 ? 'Item' : 'Items'}
+      </div>
+
+      <div onClick={goToCart} className="left-[1564px] top-[49px] absolute justify-start text-white text-base font-semibold font-['Poppins'] cursor-pointer">
+        {fmt(totalPrice)}
+      </div>
+
       <div className="w-16 h-0 left-[1434px] top-[26px] absolute origin-top-left rotate-90 opacity-30 outline outline-1 outline-offset-[-0.50px] outline-white"></div>
       <div className="w-16 h-0 left-[1546px] top-[26px] absolute origin-top-left rotate-90 opacity-30 outline outline-1 outline-offset-[-0.50px] outline-white"></div>
       <div className="w-16 h-0 left-[1662px] top-[26px] absolute origin-top-left rotate-90 opacity-30 outline outline-1 outline-offset-[-0.50px] outline-white"></div>
-      
-      <div className="left-[1564px] top-[49px] absolute justify-start text-white text-base font-semibold font-['Poppins']">LKR 90.5</div>
-      <div className="left-[1455px] top-[49px] absolute justify-start text-white text-base font-semibold font-['Poppins']">23 Items</div>
-      
+
       <FaChevronDown className="w-5 h-5 left-[1710px] top-[43px] absolute text-white transform -rotate-90" />
       
       
