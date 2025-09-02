@@ -154,10 +154,18 @@ const ContactUsPage = () => {
           >
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Find Us on Map</h2>
             <div className="h-80 bg-gray-200 rounded-lg overflow-hidden">
-              {/* Replace with your actual map component */}
-              <div className="w-full h-full flex items-center justify-center text-gray-500">
-                <p>Map would be displayed here</p>
-              </div>
+              {/* Google Map for Galle, Sri Lanka */}
+              <iframe
+                title="Galle Location"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63316.29342419144!2d80.170076!3d6.053519!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae173c1b6b1b6b1%3A0x400b3b0c3b0c3b0!2sGalle!5e0!3m2!1sen!2slk!4v1693824000000!5m2!1sen!2slk"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="w-full h-full"
+              ></iframe>
             </div>
           </motion.div>
 
