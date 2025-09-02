@@ -1,13 +1,44 @@
+import React from 'react';
 const HeroSection = () => {
   return (
     <>
       {/* Corrected image path for Vite public folder usage */}
-      <img
-        className="w-[1541px] left-[189px] top-[244px] absolute rounded-[48px] object-contain aspect-[1541/939]"
-        src="/Assets/main_banner_bg.jpg"
-        alt="hero banner"
-        style={{ height: 'auto' }}
-      />
+      {/* Simple Image Slider */}
+      {(() => {
+        const images = [
+          '/Assets/main_banner_bg.jpg',
+          '/Assets/SignIn_bg.jpg',
+          '/Assets/slide2.jpg',
+        ];
+        const [current, setCurrent] = React.useState(0);
+        React.useEffect(() => {
+          const interval = setInterval(() => {
+            setCurrent((prev) => (prev + 1) % images.length);
+          }, 3000);
+          return () => clearInterval(interval);
+        }, [images.length]);
+        return (
+          <div className="absolute left-[189px] top-[244px] w-[1541px] aspect-[1541/939] rounded-[48px] overflow-hidden shadow-lg group">
+            <img
+              src={images[current]}
+              alt="hero banner"
+              className="w-full h-full object-contain transition-all duration-500"
+              style={{ borderRadius: 48 }}
+            />
+            {/* Dots */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {images.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrent(idx)}
+                  className={`w-3 h-3 rounded-full ${current === idx ? 'bg-amber-500' : 'bg-white/60'} border border-amber-300 transition`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })()}
       <div className="absolute left-[400px] top-[510px] flex flex-col gap-4">
         <div>
           <span className="text-white text-5xl font-semibold font-['Poppins'] leading-tight">Feast Your Senses, </span>
