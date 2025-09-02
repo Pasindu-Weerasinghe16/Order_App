@@ -1,67 +1,56 @@
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaUtensils } from 'react-icons/fa';
 
+
 const Footer = () => {
   return (
-    <>
-      <div className="w-[1920px] h-96 left-0 top-[3556px] absolute opacity-60 bg-zinc-300" />
-      <div className="w-40 left-[1560px] top-[3637px] absolute justify-start text-slate-950 text-lg font-bold font-['Poppins'] leading-10">Important Links</div>
-      <div className="w-32 left-[1280px] top-[3637px] absolute justify-start text-slate-950 text-lg font-bold font-['Poppins'] leading-10">Legal Pages</div>
-      <div className="w-80 left-[696.67px] top-[3637px] absolute justify-start text-slate-950 text-lg font-bold font-['Poppins'] leading-10">Get Exclusive Deals in your Inbox</div>
-      <div className="w-64 left-[730px] top-[3758px] absolute justify-start">
-        <span className="text-slate-950 text-xs font-normal font-['Poppins'] leading-10">we wont spam, read our </span>
-        <span className="text-slate-950 text-xs font-normal font-['Poppins'] underline leading-10">email policy</span>
-      </div>
-      <div className="w-[1920px] h-20 left-0 top-[3927px] absolute bg-slate-950" />
-      <div className="w-[727.78px] left-[1081.11px] top-[3956px] absolute justify-start text-white text-base font-normal font-['Poppins']">
-        Privacy Policy          Terms          Pricing           Do not sell or share my personal information
-      </div>
-      <div className="w-96 left-[128.89px] top-[3953px] absolute justify-start text-white text-base font-normal font-['Poppins']">
-        Order.uk Copyright 2024, All Rights Reserved.
-      </div>
-      {/* Logo area with icon and brand name */}
-      <div className="flex items-center gap-4 left-[128px] top-[3649px] absolute">
-        <FaUtensils className="text-amber-500 text-5xl" />
-        <span className="text-3xl font-extrabold font-['Poppins'] text-slate-950">Order</span>
-      </div>
-      
-      <div className="w-96 h-44 left-[1560px] top-[3676px] absolute justify-start text-black text-base font-normal font-['Poppins'] underline leading-10">
-        Get help<br />
-        Add your restaurant<br />
-        Sign up to deliver<br />
-        Create a business account
-      </div>
-      
-      <div className="w-96 h-52 left-[1280px] top-[3676px] absolute justify-start text-black text-base font-normal font-['Poppins'] underline leading-10">
-        Terms and conditions<br />
-        Privacy<br />
-        Cookies<br />
-        Modern Slavery Statement
-      </div>
-      
-      {/* Modern logo background area (simplified) */}
-      <div className="w-96 h-14 left-[127.78px] top-[3748px] absolute flex items-center justify-center bg-gradient-to-r from-amber-200 via-white to-amber-100 rounded-xl shadow">
-        <FaUtensils className="text-amber-500 text-3xl mr-2" />
-        <span className="text-xl font-bold text-slate-950">Order</span>
-      </div>
-      
-      <div className="w-96 h-14 left-[696.67px] top-[3703px] absolute bg-zinc-300 rounded-[120px]" />
-      <div className="w-48 h-14 left-[1045.56px] top-[3703px] absolute bg-amber-500 rounded-[120px]" />
-      <div className="w-48 left-[730px] top-[3711px] absolute justify-start text-black/60 text-base font-normal font-['Poppins'] leading-10">
-        youremail@gmail.com
-      </div>
-      <div className="w-28 h-6 left-[1092.22px] top-[3721px] absolute justify-start text-white text-lg font-medium font-['Poppins']">
-        Subscribe
-      </div>
-      
-      <div className="flex left-[724.44px] top-[3812px] absolute gap-[65.56px]">
-        {/* Social Media Icons using react-icons */}
-        <a href="#" aria-label="Facebook" className="text-blue-600 hover:text-blue-800 text-3xl"><FaFacebookF /></a>
-        <a href="#" aria-label="Twitter" className="text-sky-500 hover:text-sky-700 text-3xl"><FaTwitter /></a>
-        <a href="#" aria-label="Instagram" className="text-pink-500 hover:text-pink-700 text-3xl"><FaInstagram /></a>
-        <a href="#" aria-label="LinkedIn" className="text-blue-800 hover:text-blue-900 text-3xl"><FaLinkedinIn /></a>
-      </div>
-    </>
-  )
-}
+    <div style={{ width: '1920px', position: 'absolute', top: '3556px', left: 0 }}>
+      <footer className="bg-gradient-to-r from-amber-100 to-amber-200 border-t border-amber-300 py-12 mt-16">
+        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <FaUtensils className="text-amber-500 text-3xl" />
+              <span className="text-3xl font-extrabold text-amber-600">Order</span>
+            </div>
+            <p className="text-slate-700 text-sm mb-4">Order Copyright 2024, All Rights Reserved.</p>
+            <div className="flex gap-4">
+              <a href="#" aria-label="Facebook" className="text-blue-600 hover:text-blue-800 text-2xl"><FaFacebookF /></a>
+              <a href="#" aria-label="Twitter" className="text-sky-500 hover:text-sky-700 text-2xl"><FaTwitter /></a>
+              <a href="#" aria-label="Instagram" className="text-pink-500 hover:text-pink-700 text-2xl"><FaInstagram /></a>
+              <a href="#" aria-label="LinkedIn" className="text-blue-800 hover:text-blue-900 text-2xl"><FaLinkedinIn /></a>
+            </div>
+          </div>
+          <div>
+            <h4 className="text-slate-950 text-lg font-bold mb-4">Get Exclusive Deals in your Inbox</h4>
+            <div className="flex">
+              <input type="email" placeholder="youremail@gmail.com" className="flex-1 bg-white rounded-l-full px-6 py-3 border border-black/20" />
+              <button className="bg-amber-500 text-white px-6 py-3 rounded-r-full font-medium">Subscribe</button>
+            </div>
+            <p className="text-slate-700 text-xs mt-2">We won't spam, read our <span className="underline">email policy</span></p>
+          </div>
+          <div className="grid grid-cols-2 gap-8">
+            <div>
+              <h4 className="text-slate-950 text-lg font-bold mb-4">Important Links</h4>
+              <ul className="space-y-2 text-black ">
+                <li>Get help</li>
+                <li>Add your restaurant</li>
+                <li>Sign up to deliver</li>
+                <li>Create a business account</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-slate-950 text-lg font-bold mb-4">Legal Pages</h4>
+              <ul className="space-y-2 text-black ">
+                <li>Terms and conditions</li>
+                <li>Privacy</li>
+                <li>Cookies</li>
+                <li>Modern Slavery Statement</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
 
-export default Footer
+export default Footer;
