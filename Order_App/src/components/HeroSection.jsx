@@ -1,4 +1,6 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+
 const HeroSection = () => {
   return (
     <>
@@ -14,7 +16,7 @@ const HeroSection = () => {
         React.useEffect(() => {
           const interval = setInterval(() => {
             setCurrent((prev) => (prev + 1) % images.length);
-          }, 3000);
+          }, 6000);
           return () => clearInterval(interval);
         }, [images.length]);
         return (
@@ -22,7 +24,7 @@ const HeroSection = () => {
             <img
               src={images[current]}
               alt="hero banner"
-              className="w-full h-full object-contain transition-all duration-500"
+              className="w-full h-full object-contain transition-all duration-300"
               style={{ borderRadius: 48 }}
             />
             {/* Dots */}
@@ -39,12 +41,20 @@ const HeroSection = () => {
           </div>
         );
       })()}
-      <div className="absolute left-[400px] top-[510px] flex flex-col gap-4">
+      <div className="absolute left-[400px] top-[510px] flex flex-col gap-4 z-20">
         <div>
-          <span className="text-white text-5xl font-semibold font-['Poppins'] leading-tight">Feast Your Senses, </span>
-          <span className="text-amber-500 text-5xl font-semibold font-['Poppins'] leading-tight">Fast and Fresh</span>
+          <motion.div
+            whileHover={{ y: -10, opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="cursor-pointer"
+          >
+            <span className="text-white text-5xl font-semibold font-['Poppins'] leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">Feast Your Senses, </span>
+            <span className="text-amber-500 text-5xl font-semibold font-['Poppins'] leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">Fast and Fresh</span>
+          </motion.div>
         </div>
-        <div className="text-white text-lg font-normal font-['Poppins']">Order Restaurant food, takeaway and groceries.</div>
+        <div className="text-white text-lg font-normal font-['Poppins'] drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">Order Restaurant food, takeaway and groceries.</div>
         <div className="flex items-center gap-2 mt-4">
           <input
             type="text"
