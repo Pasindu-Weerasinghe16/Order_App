@@ -1,7 +1,9 @@
 // pages/FlashSalePage.jsx
+
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import FlashSaleNavBar from '../components/FlashSaleNavBar';
+import Footer from '../components/Footer';
 
 
 const CART_KEY = 'supermart_cart_v1';
@@ -290,63 +292,11 @@ const FlashSalePage = () => {
         </motion.div>
       </div>
 
-      {/* Footer (kept simple) */}
-      <div className="bg-zinc-300 py-12 mt-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <img src="/assets/logo_footer.png" alt="Logo" className="h-12 mb-4" />
-              <div className="flex gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <img key={i} src={`/assets/social_${i}.png`} alt="Social" className="w-10 h-10" />
-                ))}
-              </div>
-            </div>
 
-            <div>
-              <h4 className="text-slate-950 text-lg font-bold mb-4">Get Exclusive Deals in your Inbox</h4>
-              <div className="flex">
-                <input type="email" placeholder="youremail@gmail.com" className="flex-1 bg-zinc-300 rounded-l-full px-6 py-3 border border-black/40" />
-                <button className="bg-amber-500 text-white px-6 py-3 rounded-r-full font-medium">Subscribe</button>
-              </div>
-              <p className="text-slate-950 text-xs mt-2">we won't spam, read our <span className="underline">email policy</span></p>
-            </div>
 
-            <div className="grid grid-cols-2 gap-8">
-              <div>
-                <h4 className="text-slate-950 text-lg font-bold mb-4">Important Links</h4>
-                <ul className="space-y-2 text-black underline">
-                  <li>Get help</li>
-                  <li>Add your restaurant</li>
-                  <li>Sign up to deliver</li>
-                  <li>Create a business account</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-slate-950 text-lg font-bold mb-4">Legal Pages</h4>
-                <ul className="space-y-2 text-black underline">
-                  <li>Terms and conditions</li>
-                  <li>Privacy</li>
-                  <li>Cookies</li>
-                  <li>Modern Slavery Statement</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div className="bg-slate-950 py-4">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-white">Order.uk Copyright 2024, All Rights Reserved.</p>
-          <div className="flex gap-8 text-white">
-            <span>Privacy Policy</span>
-            <span>Terms</span>
-            <span>Pricing</span>
-            <span>Do not sell or share my personal information</span>
-          </div>
-        </div>
-      </div>
+
+      
 
       {/* Toast */}
       {toast && (
