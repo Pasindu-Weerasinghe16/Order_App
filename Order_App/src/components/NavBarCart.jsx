@@ -123,14 +123,18 @@ const NavBarCart = () => {
 
       <FaChevronDown className="w-5 h-5 left-[1710px] top-[43px] absolute text-white transform -rotate-90" />
 
-      {/* Logo */}
-      <motion.div 
-        className="w-44 h-14 left-[128px] top-[122px] absolute bg-gray-800 text-white flex items-center justify-center text-xl font-bold rounded"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+       {/* Logo - Modern, beautiful design with hover animation */}
+      <motion.div
+        className="absolute left-[128px] top-[130px] flex items-center gap-3 px-6 py-2 bg-white/90 rounded-2xl shadow-lg border border-gray-200 cursor-pointer"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ scale: 1.02, boxShadow: '0 8px 32px 0 rgba(60, 180, 75, 0.15)' }}
         transition={{ duration: 0.5 }}
+        style={{ zIndex: 10 }}
       >
-        Order
+        
+        <span className="font-extrabold text-2xl md:text-3xl text-green-700 tracking-tight font-[Poppins] select-none" style={{letterSpacing: '0.04em'}}>ORDER</span>
+        <span className="font-semibold text-base md:text-lg text-gray-500 tracking-wide ml-1 select-none">SUPERMARKET</span>
       </motion.div>
 
       {/* Navigation Links */}
