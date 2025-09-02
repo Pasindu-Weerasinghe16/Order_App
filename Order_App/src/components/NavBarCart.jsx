@@ -75,18 +75,12 @@ const NavBarCart = () => {
         className="left-[862px] top-[49px] absolute justify-start"
         whileHover={{ scale: 1.02 }}
       >
-        <span className="text-slate-950 text-base font-medium font-['Poppins']">Regent Street, </span>
-        <span className="text-slate-950 text-base font-medium font-['Poppins'] underline">A4</span>
-        <span className="text-slate-950 text-base font-medium font-['Poppins']">, A4201, London</span>
+  <span className="text-slate-950 text-base font-medium font-['Poppins']">No. 123, Matara Road, </span>
+  <span className="text-slate-950 text-base font-medium font-['Poppins'] underline">A2</span>
+  <span className="text-slate-950 text-base font-medium font-['Poppins']">, Galle, Sri Lanka</span>
       </motion.div>
 
-      <motion.div 
-        className="left-[1120px] top-[51px] absolute justify-start text-amber-500 text-sm font-medium font-['Poppins'] underline"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        Change Location
-      </motion.div>
+      
 
       <FaMapMarkerAlt className="w-6 h-6 left-[823px] top-[48px] absolute text-gray-700" />
 
