@@ -14,7 +14,16 @@ function App() {
   const [userInfo, setUserInfo] = useState(null);
   
   useEffect(() => {
-    setUserInfo(JSON.parse(localStorage.getItem('userInfo')));
+    const updateUserInfo = () => {
+      setUserInfo(JSON.parse(localStorage.getItem('userInfo')));
+    };
+    updateUserInfo();
+    window.addEventListener('storage', updateUserInfo);
+    window.addEventListener('userInfo_updated', updateUserInfo);
+    return () => {
+      window.removeEventListener('storage', updateUserInfo);
+      window.removeEventListener('userInfo_updated', updateUserInfo);
+    };
   }, []);
 
   return (
@@ -25,12 +34,12 @@ function App() {
         <Route path="/product" element={<Cart />} />
         <Route path="/contact-us" element={<ContactUsPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/login" element={<SignInPage />} />
+        {/* Removed /login route, use only / for login */}
         <Route path="/supplier-signup" element={<SignUpSupplierPage />} />
         <Route path="/flash-sale" element={<FlashSalePage />} />
         <Route 
           path="/supplier" 
-          element={userInfo?.isSupplier ? <SupplierDashboard /> : <Navigate to="/login" replace />} 
+          element={userInfo?.isSupplier ? <SupplierDashboard /> : <Navigate to="/" replace />} 
         />
         <Route path="/cart-page" element={<CartPage />} />
       </Routes>

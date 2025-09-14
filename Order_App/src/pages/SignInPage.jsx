@@ -28,10 +28,11 @@ const SignInPage = () => {
 
     if (response.ok) {
       localStorage.setItem('userInfo', JSON.stringify(data));
+      window.dispatchEvent(new Event('userInfo_updated'));
       if (data.isSupplier) {
         navigate('/supplier');
       } else {
-  navigate('/home');
+        navigate('/home');
       }
     } else {
       throw new Error(data.message || 'Login failed');
