@@ -6,8 +6,13 @@ const {
   getProducts,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  getTopSuppliersAnalytics,
+  getSupplierAnalytics
 } = require('../controllers/ProductController');
+// Supplier analytics endpoints
+router.get('/supplier-analytics', getTopSuppliersAnalytics);
+router.get('/supplier-analytics/:email', getSupplierAnalytics);
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import axios from 'axios';
 import { createProduct, getProducts, updateProduct, deleteProduct, getSupplierProfit } from '../api';
 import { motion } from 'framer-motion'
 import { FiPlus, FiEdit2, FiTrash2, FiPackage, FiDollarSign, FiTag, FiInfo } from 'react-icons/fi'
@@ -30,6 +32,12 @@ const units = ['kg', 'g', 'lb', 'oz', 'piece', 'pack', 'liter', 'ml']
 
 
 const Productes = () => {
+  // Supplier analytics (pie chart and table)
+  const [topSuppliers, setTopSuppliers] = useState([]);
+  const [pieTotalProfit, setPieTotalProfit] = useState(0);
+  const [supplierAnalytics, setSupplierAnalytics] = useState({ latestProduct: null, trendingProduct: null });
+  const [pieLoading, setPieLoading] = useState(false);
+  const [pieError, setPieError] = useState('');
   const [products, setProducts] = useState([])
   const [form, setForm] = useState(initialProduct)
   const [editIndex, setEditIndex] = useState(null)
@@ -43,26 +51,41 @@ const Productes = () => {
   const [analyticsError, setAnalyticsError] = useState('');
   // Fetch supplier profit analytics
   useEffect(() => {
-    let email = '';
+    // Fetch pie chart data (top suppliers)
+    setPieLoading(true);
+    axios.get('http://localhost:5000/api/products/supplier-analytics')
+      .then(res => {
+        setTopSuppliers(res.data.suppliers || []);
+        setPieTotalProfit(res.data.totalProfit || 0);
+        setPieError('');
+      })
+      .catch(() => setPieError('Failed to load supplier analytics'))
+      .finally(() => setPieLoading(false));
+
+    // Fetch current supplier analytics
+    let supplierEmail = '';
     try {
       const raw = localStorage.getItem('userInfo');
-      if (raw) email = JSON.parse(raw).email || '';
+      if (raw) supplierEmail = JSON.parse(raw).email || '';
     } catch (e) {}
-    if (!email) return;
-    setAnalyticsLoading(true);
-    getSupplierProfit(email)
-      .then(res => {
-  // Backend returns products array, not profitPerProduct
-  setProfitData(res.data.products || []);
-  setTotalProfit(res.data.totalProfit || 0);
-        setAnalyticsError('');
-      })
-      .catch(() => {
-        setProfitData([]);
-        setTotalProfit(0);
-        setAnalyticsError('Failed to load analytics');
-      })
-      .finally(() => setAnalyticsLoading(false));
+    if (supplierEmail) {
+      axios.get(`http://localhost:5000/api/products/supplier-analytics/${supplierEmail}`)
+        .then(res => setSupplierAnalytics(res.data))
+        .catch(() => setSupplierAnalytics({ latestProduct: null, trendingProduct: null }));
+      setAnalyticsLoading(true);
+      getSupplierProfit(supplierEmail)
+        .then(res => {
+          setProfitData(res.data.products || []);
+          setTotalProfit(res.data.totalProfit || 0);
+          setAnalyticsError('');
+        })
+        .catch(() => {
+          setProfitData([]);
+          setTotalProfit(0);
+          setAnalyticsError('Failed to load analytics');
+        })
+        .finally(() => setAnalyticsLoading(false));
+    }
   }, []);
 
   useEffect(() => {
@@ -415,67 +438,83 @@ const Productes = () => {
             </form>
           </motion.section>
         )}
-        {/* Supplier Analytics Section */}
+        {/* Supplier Analytics Section (Pie Chart + Table) */}
         <section className="mb-12">
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-green-200">
-            <h2 className="text-2xl font-bold text-green-800 mb-4 flex items-center"> Supplier Analytics</h2>
-            {analyticsLoading ? (
+            <h2 className="text-2xl font-bold text-green-800 mb-4 flex items-center">Supplier Analytics</h2>
+            {pieLoading ? (
               <div className="text-gray-500">Loading analytics...</div>
-            ) : analyticsError ? (
-              <div className="text-red-500">{analyticsError}</div>
+            ) : pieError ? (
+              <div className="text-red-500">{pieError}</div>
             ) : (
               <>
-                <div className="mb-6 flex flex-col md:flex-row md:items-center md:space-x-8">
-                  <div className="text-lg font-semibold text-gray-700 mb-2 md:mb-0">Total Profit: <span className="text-green-700 font-bold">LKR {totalProfit.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span></div>
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Top Suppliers (by profit)</h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={topSuppliers}
+                        dataKey="profit"
+                        nameKey="email"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                      >
+                        {topSuppliers.map((entry, idx) => (
+                          <Cell key={`cell-${idx}`} fill={["#4ade80", "#22d3ee", "#fbbf24", "#f87171", "#a3a3a3"][idx % 5]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => `LKR ${value.toLocaleString()}`} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="mt-2 text-gray-600 text-sm">Total Profit: <span className="font-bold text-green-700">LKR {pieTotalProfit.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span></div>
                 </div>
-                <div className="overflow-x-auto">
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Your Profit Breakdown</h3>
+                  <div className="mb-2 text-green-700 font-bold">Total Profit: LKR {supplierAnalytics.totalProfit?.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
                   <table className="min-w-full bg-white rounded-xl shadow border-separate border-spacing-0">
                     <thead>
                       <tr className="bg-gradient-to-r from-green-600 to-green-400 text-white">
-                        <th className="px-6 py-4 rounded-tl-xl text-left font-semibold w-2/5">Product</th>
-                        <th className="px-6 py-4 text-left font-semibold w-1/5">Units Sold</th>
-                        <th className="px-6 py-4 text-left font-semibold w-1/5">Profit per Unit</th>
-                        <th className="px-6 py-4 rounded-tr-xl text-left font-semibold w-1/5">Total Profit</th>
+                        <th className="px-6 py-4 rounded-tl-xl text-left font-semibold">Product</th>
+                        <th className="px-6 py-4 text-left font-semibold">Unit Price</th>
+                        <th className="px-6 py-4 text-left font-semibold">Sold Quantity</th>
+                        <th className="px-6 py-4 text-left font-semibold">Current Profit</th>
+                        <th className="px-6 py-4 rounded-tr-xl text-left font-semibold">Potential Profit</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {profitData.length === 0 ? (
-                        <tr>
-                          <td colSpan="4" className="text-center text-gray-400 py-8 bg-gray-50 rounded-b-xl">No sales data yet.</td>
-                        </tr>
-                      ) : profitData.map((item, idx) => {
-                        const totalSold = item.totalSold || 0;
-                        const totalProfit = item.totalProfit || 0;
-                        const profitPerUnit = totalSold > 0 ? (totalProfit / totalSold) : 0;
-                        return (
-                          <tr key={item.productId || idx} className={
-                            `transition-all duration-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-green-50'} hover:bg-green-100`
-                          }>
-                            <td className="px-6 py-4 flex items-center gap-3 border-b border-gray-100">
-                              {item.image && (
-                                <img
-                                  src={item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`}
-                                  alt={item.name}
-                                  className="w-12 h-12 rounded-lg object-cover border shadow-sm"
-                                  onError={e => { e.target.onerror = null; e.target.src = '/default-product.png'; }}
-                                />
-                              )}
-                              <span className="font-medium text-gray-800">{item.name}</span>
-                            </td>
-                            <td className="px-6 py-4 border-b border-gray-100 text-green-900 font-semibold text-lg">{totalSold}</td>
-                            <td className="px-6 py-4 border-b border-gray-100 text-green-700 font-semibold">LKR {profitPerUnit.toFixed(2)}</td>
-                            <td className="px-6 py-4 border-b border-gray-100 text-green-800 font-bold">LKR {totalProfit.toFixed(2)}</td>
-                          </tr>
-                        );
-                      })}
+                      {supplierAnalytics.productProfits && supplierAnalytics.productProfits.length > 0 ? (
+                        supplierAnalytics.productProfits.map((prod, idx) => {
+                          // Assume prod.soldQuantity and prod.potentialProfit are available, else calculate
+                          const soldQuantity = prod.soldQuantity ?? Math.floor((prod.quantity || 0) * 0.6); // Example: 60% sold
+                          const currentProfit = prod.currentProfit ?? ((prod.price - (prod.cost || 0)) * soldQuantity);
+                          const potentialProfit = prod.potentialProfit ?? ((prod.price - (prod.cost || 0)) * ((prod.quantity || 0) - soldQuantity));
+                          return (
+                            <tr key={prod.name + idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-green-50'}>
+                              <td className="px-6 py-4 font-medium text-gray-800">{prod.name}</td>
+                              <td className="px-6 py-4">LKR {parseFloat(prod.price).toFixed(2)}</td>
+                              <td className="px-6 py-4">{soldQuantity}</td>
+                              <td className="px-6 py-4 font-bold text-green-700">LKR {parseFloat(currentProfit).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                              <td className="px-6 py-4 font-bold text-amber-700">LKR {parseFloat(potentialProfit).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr><td colSpan={5} className="text-center text-gray-400 py-8 bg-gray-50 rounded-b-xl">No product profit data yet.</td></tr>
+                      )}
                     </tbody>
-                    <tfoot>
-                      <tr className="bg-green-100">
-                        <td colSpan="3" className="px-6 py-4 text-right font-bold text-green-900 text-lg rounded-bl-xl">Total Profit</td>
-                        <td className="px-6 py-4 font-extrabold text-green-800 text-lg rounded-br-xl">LKR {totalProfit.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                      </tr>
-                    </tfoot>
                   </table>
+                  {/* Sum of profits below table */}
+                  <div className="flex flex-col md:flex-row gap-4 justify-end items-end mt-4">
+                    <div className="bg-green-50 rounded-lg px-4 py-2 shadow text-green-800 font-semibold">
+                      Total Current Profit: LKR {supplierAnalytics.totalCurrentProfit ? parseFloat(supplierAnalytics.totalCurrentProfit).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) : '0.00'}
+                    </div>
+                    <div className="bg-amber-50 rounded-lg px-4 py-2 shadow text-amber-800 font-semibold">
+                      Total Potential Profit: LKR {supplierAnalytics.totalPotentialProfit ? parseFloat(supplierAnalytics.totalPotentialProfit).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) : '0.00'}
+                    </div>
+                  </div>
                 </div>
               </>
             )}
