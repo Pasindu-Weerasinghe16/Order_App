@@ -176,7 +176,7 @@ const SignUpPage = () => {
                 <span className="text-zinc-600 text-base md:text-lg font-normal">
                   Already have an account?
                 </span>
-                <Link to="/login">
+                <Link to="/">
                   <motion.span 
                     className="text-gray-800 font-medium underline px-1"
                     whileHover={{ scale: 1.1 }}
